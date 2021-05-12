@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'com.kurtsevich'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(':API'))
+//    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
+
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}

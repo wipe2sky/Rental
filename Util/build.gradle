@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'com.kurtsevich'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.defaultComponentModel=spring',
+            '-Amapstruct.unmappedTargetPolicy=IGNORE'
+    ]
+}
+
+dependencies {
+    compile (project(':Model'))
+    implementation 'mysql:mysql-connector-java:8.0.22'
+    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.2.Final'
+    annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.4.2.Final'
+}
+
+test {
+    useJUnitPlatform()
+}

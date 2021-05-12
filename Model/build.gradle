@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'com.kurtsevich'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.hibernate:hibernate-core:5.4.25.Final'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.4.5'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.5'
+}
+
+test {
+    useJUnitPlatform()
+}
