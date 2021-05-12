@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(':API'))
-    implementation(project(":Security"))
+    implementation(project(':Security'))
 }
 
 test {

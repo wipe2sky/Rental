@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Entity
 @Data
+@ToString(exclude="users")
 @Table(name = "role")
 public class Role extends BaseEntity{
     @Enumerated(EnumType.STRING)

@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Entity
 @Data
+@ToString(exclude = "user")
 @Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)
@@ -34,7 +36,7 @@ public class UserProfile extends BaseEntity {
     private Date updated;
 
     @Column(name = "phone_number")
-    private int phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "first_name")
     private String firstName;
@@ -49,7 +51,7 @@ public class UserProfile extends BaseEntity {
     private BigDecimal prepayments;
 
     @OneToOne
-    @JoinColumn(name = "passport", nullable = false)
+    @JoinColumn(name = "passport")
     private Passport passport;
 
     @OneToOne

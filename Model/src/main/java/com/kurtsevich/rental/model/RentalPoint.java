@@ -32,13 +32,13 @@ public class RentalPoint extends BaseEntity{
     private char streetAddressNumberSuffix;
 
     @Column(name = "phone_number")
-    private int phoneNumber;
-
-    @Column(name = "longitude")
-    private Float longitude;
+    private String phoneNumber;
 
     @Column(name = "latitude")
     private Float latitude;
+
+    @Column(name = "longitude")
+    private Float longitude;
 
     @OneToMany(mappedBy = "rentalPoint", fetch = FetchType.LAZY)
     private List<Scooter> scooters;
