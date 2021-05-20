@@ -3,8 +3,10 @@ package com.kurtsevich.rental.model;
 import com.kurtsevich.rental.Status;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -27,13 +30,13 @@ public class UserProfile extends BaseEntity {
     @Column(name = "status")
     private Status status;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created")
-    private Date created;
+    private LocalDateTime created;
 
-    @CreatedDate
+    @UpdateTimestamp
     @Column(name = "updated")
-    private Date updated;
+    private LocalDateTime updated;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -50,7 +53,7 @@ public class UserProfile extends BaseEntity {
     @Column(name = "prepayments")
     private BigDecimal prepayments;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "passport")
     private Passport passport;
 

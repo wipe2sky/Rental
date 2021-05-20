@@ -4,14 +4,11 @@ import com.kurtsevich.rental.Status;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Data
-public class RoleWithoutUsersDto {
+public class UserStatusDto {
     @NotNull
-    private String name;
-    private LocalDate created;
-    private LocalDate updated;
+    private Long userId;
     @NotNull
     private Status status;
 }

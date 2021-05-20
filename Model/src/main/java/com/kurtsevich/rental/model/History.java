@@ -1,6 +1,7 @@
 package com.kurtsevich.rental.model;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.CascadeType;
@@ -11,19 +12,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Data
 @Table(name = "history")
 public class History extends BaseEntity{
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created")
-    private Date created;
+    private LocalDateTime created;
 
-    @CreatedDate
     @Column(name = "finished")
-    private Date finished;
+    private LocalDateTime finished;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -34,11 +35,11 @@ public class History extends BaseEntity{
     @Column(name = "is_actual")
     private boolean isActual;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scooter")
     private Scooter scooter;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile")
     private UserProfile userProfile;
 }

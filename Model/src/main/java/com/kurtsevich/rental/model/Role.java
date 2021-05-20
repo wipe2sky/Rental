@@ -3,6 +3,8 @@ package com.kurtsevich.rental.model;
 import com.kurtsevich.rental.Status;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Column;
@@ -12,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,13 +27,13 @@ public class Role extends BaseEntity{
     @Column(name = "status")
     private Status status;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created")
-    private Date created;
+    private LocalDateTime created;
 
-    @CreatedDate
+    @UpdateTimestamp
     @Column(name = "updated")
-    private Date updated;
+    private LocalDateTime updated;
 
     @Column(name = "name")
     private String name;

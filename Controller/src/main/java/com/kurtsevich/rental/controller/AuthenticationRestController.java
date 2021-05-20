@@ -2,15 +2,19 @@ package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IUserService;
 import com.kurtsevich.rental.dto.AuthenticationRequestDto;
+import com.kurtsevich.rental.dto.ChangeUserPasswordDto;
+import com.kurtsevich.rental.dto.CreatedUserDto;
 import com.kurtsevich.rental.dto.UserTokenDto;
 import com.kurtsevich.rental.model.User;
 import com.kurtsevich.rental.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +32,12 @@ public class AuthenticationRestController {
         String username = requestDto.getUsername();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
         User user = userService.findByUsername(username);
-        if (user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("User with username: " + username + "not found.");
         }
         String token = jwtTokenProvider.createToken(username, user.getRoles());
 
         return ResponseEntity.ok(new UserTokenDto().setUsername(username).setToken(token));
     }
+
 }

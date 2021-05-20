@@ -35,7 +35,6 @@ allprojects {
 dependencies {
 
     compile(project(':Controller'))
-    compile(project(':DAO'))
     compile(project(':Service'))
 }
 
