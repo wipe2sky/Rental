@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.model.Passport;
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class CreatedUserDto {
+public class CreateUserDto {
     private String username;
 
     private String password;

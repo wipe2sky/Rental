@@ -4,4 +4,5 @@ import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
 
 public interface IRoleService {
     void add(RoleWithoutUsersDto roleWithoutUsersDto);
+    void delete(Long id);
 }

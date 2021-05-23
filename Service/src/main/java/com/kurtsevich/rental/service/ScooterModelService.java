@@ -2,13 +2,15 @@ package com.kurtsevich.rental.service;
 
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
+import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.service.IScooterModelService;
-import com.kurtsevich.rental.dto.ScooterModelDto;
+import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
 import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.ScooterModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,15 +28,19 @@ public class ScooterModelService implements IScooterModelService {
     @Override
     public void add(ScooterModelDto scooterModelDto) {
         ScooterModel scooterModel = mapper.scooterModelDtoToScooterModel(scooterModelDto);
-        scooterModel.setStatus(Status.ACTIVE);
         scooterModelRepository.saveAndFlush(scooterModel);
+        log.info("IN ScooterModelService:add - scooterModel {} created", scooterModel);
     }
 
     @Override
-    public List<ScooterModelDto> getAll() {
-        return scooterModelRepository.findAll().stream()
+    public List<ScooterModelDto> getAll(Pageable page) {
+        List<ScooterModelDto> result = scooterModelRepository.findAll(page).stream()
                 .map(mapper::scooterModelToScooterModelDto)
                 .collect(Collectors.toList());
+        if (result.isEmpty()) {
+            throw new ServiceException("Request page number greater than available");
+        }
+        return result;
     }
 
     @Override
@@ -48,6 +54,8 @@ public class ScooterModelService implements IScooterModelService {
         scooterModelRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id))
                 .setStatus(Status.DELETED);
+        log.info("IN ScooterModelService:delete - scooterModel {} deleted", id);
+
     }
 
     @Override
@@ -56,7 +64,7 @@ public class ScooterModelService implements IScooterModelService {
         if (scooterModel == null) {
             throw new NotFoundEntityException(scooterModelDto.getModel());
         }
-        if (!scooterModelDto.getName().isBlank()) {
+        if (scooterModelDto.getName() != null) {
             scooterModel.setName(scooterModelDto.getName());
         }
         if (scooterModelDto.getMaxSpeed() != 0) {
@@ -71,7 +79,8 @@ public class ScooterModelService implements IScooterModelService {
         if (scooterModelDto.getWeightLimit() != 0) {
             scooterModel.setWeightLimit(scooterModelDto.getWeightLimit());
         }
-        scooterModelRepository.saveAndFlush(scooterModel);
+        log.info("IN ScooterModelService:add - scooterModel {} updated", scooterModel);
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.user;
 
 import lombok.Data;
 

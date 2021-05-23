@@ -1,8 +1,10 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IScooterModelService;
-import com.kurtsevich.rental.dto.ScooterModelDto;
+import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,8 +35,9 @@ public class ScooterModelController {
     }
 
     @GetMapping("/models")
-    public ResponseEntity<List<ScooterModelDto>> getAll() {
-        return ResponseEntity.ok(scooterModelService.getAll());
+    public ResponseEntity<List<ScooterModelDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(scooterModelService.getAll(pageable));
     }
 
     @GetMapping("/models/{id}")

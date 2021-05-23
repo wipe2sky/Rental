@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.scooter;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public class ScooterModelDto {
     private String model;
     private String name;
-    private int maxSpeed;
     private Status status;
+    private int maxSpeed;
     private BigDecimal weight;
     private int weightLimit;
     private int power;

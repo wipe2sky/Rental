@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;

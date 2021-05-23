@@ -1,13 +1,15 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
+import com.kurtsevich.rental.dto.PassportDto;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-public class UserProfileDto {
+public class UserProfileWithoutHistoriesDto {
     private Status status;
     private LocalDateTime created;
     private LocalDateTime updated;
@@ -17,5 +19,4 @@ public class UserProfileDto {
     private PassportDto passport;
     private BigDecimal discount;
     private BigDecimal prepayments;
-
 }

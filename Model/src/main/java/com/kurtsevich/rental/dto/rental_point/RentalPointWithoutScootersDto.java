@@ -1,19 +1,18 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.rental_point;
 
-import com.kurtsevich.rental.model.Scooter;
+import com.kurtsevich.rental.Status;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class RentalPointWithoutScootersDto {
     private String name;
+    private Status status;
     private String city;
     private String streetName;
     private String streetType;
     private int streetAddressNumber;
     private char streetAddressNumberSuffix;
     private String phoneNumber;
-    private Float latitude;
-    private Float longitude;
+    private double longitude;
+    private double latitude;
 }

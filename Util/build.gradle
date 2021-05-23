@@ -21,6 +21,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.22'
     compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.2.Final'
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.4.2.Final'
+
 }
 
 test {

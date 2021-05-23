@@ -2,14 +2,15 @@ package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IRoleService;
 import com.kurtsevich.rental.api.service.IUserService;
-import com.kurtsevich.rental.dto.CreatedUserDto;
+import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
-import com.kurtsevich.rental.dto.UserDto;
-import com.kurtsevich.rental.dto.UserRoleDto;
-import com.kurtsevich.rental.dto.UserStatusDto;
+import com.kurtsevich.rental.dto.user.UserDto;
+import com.kurtsevich.rental.dto.user.UserRoleDto;
+import com.kurtsevich.rental.dto.user.UserStatusDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -30,9 +32,10 @@ public class RootController {
     private final IUserService userService;
     private final IRoleService roleService;
 
-    @GetMapping("/users")
-    public ResponseEntity<List<UserDto>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    @GetMapping(value = "/users")
+    public ResponseEntity<List<UserDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
 
     @GetMapping("/users/{id}")
@@ -41,8 +44,8 @@ public class RootController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<Void> addUser(@RequestBody CreatedUserDto createdUserDto){
-        userService.register(createdUserDto);
+    public ResponseEntity<Void> addUser(@RequestBody CreateUserDto createUserDto){
+        userService.register(createUserDto);
         return ResponseEntity.noContent().build();
     }
 

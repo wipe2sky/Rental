@@ -2,26 +2,28 @@ package com.kurtsevich.rental.service;
 
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
+import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.PassportRepository;
 import com.kurtsevich.rental.api.repository.RoleRepository;
 import com.kurtsevich.rental.api.repository.UserProfileRepository;
 import com.kurtsevich.rental.api.repository.UserRepository;
 import com.kurtsevich.rental.api.service.IUserService;
-import com.kurtsevich.rental.dto.ChangeUserPasswordDto;
-import com.kurtsevich.rental.dto.CreatedUserDto;
+import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
+import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.EditPassportDto;
-import com.kurtsevich.rental.dto.EditUserProfileDto;
-import com.kurtsevich.rental.dto.UserDto;
-import com.kurtsevich.rental.dto.UserRoleDto;
-import com.kurtsevich.rental.dto.UserStatusDto;
+import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.UserDto;
+import com.kurtsevich.rental.dto.user.UserRoleDto;
+import com.kurtsevich.rental.dto.user.UserStatusDto;
 import com.kurtsevich.rental.model.Passport;
 import com.kurtsevich.rental.model.Role;
 import com.kurtsevich.rental.model.User;
 import com.kurtsevich.rental.model.UserProfile;
-import com.kurtsevich.rental.util.CreatedUserMapper;
+import com.kurtsevich.rental.util.CreateUserMapper;
 import com.kurtsevich.rental.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,19 +45,19 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final PassportRepository passportRepository;
     private final UserMapper userMapper;
-    private final CreatedUserMapper createdUserMapper;
+    private final CreateUserMapper createUserMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public void register(CreatedUserDto createdUserDto) {
-        User user = createdUserMapper.CreatedUserDtoToUser(createdUserDto);
-        UserProfile userProfile = createdUserMapper.CreatedUserDtoToUserProfile(createdUserDto);
-        user.setPassword(passwordEncoder.encode(createdUserDto.getPassword()));
+    public void register(CreateUserDto createUserDto) {
+        User user = createUserMapper.CreatedUserDtoToUser(createUserDto);
+        UserProfile userProfile = createUserMapper.CreatedUserDtoToUserProfile(createUserDto);
+        user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         userRepository.saveAndFlush(user);
 
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
 
-        Passport passport = createdUserMapper.CreatedUserDtoToPassport(createdUserDto);
+        Passport passport = createUserMapper.CreatedUserDtoToPassport(createUserDto);
         passportRepository.saveAndFlush(passport);
 
         userProfile.setUser(user);
@@ -64,14 +66,19 @@ public class UserService implements IUserService {
         userProfile.setPrepayments(new BigDecimal(0));
         userProfileRepository.saveAndFlush(userProfile);
 
-        log.info("In register - user {} successfully registered", user);
+        log.info("In UserService:register - user {} successfully registered", user);
     }
 
     @Override
-    public List<UserDto> getAll() {
-        return userRepository.findAll().stream()
+    public List<UserDto> getAll(Pageable page) {
+        List<UserDto> userDtoList = userRepository.findAll(page).stream()
                 .map(userMapper::userToUserDto)
                 .collect(Collectors.toList());
+
+        if (userDtoList.isEmpty()) {
+            throw new ServiceException("Request page number greater than available");
+        }
+        return userDtoList;
     }
 
     @Override
@@ -86,6 +93,8 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new NotFoundEntityException(id))
                 .getUserProfile()
                 .setStatus(Status.DELETED);
+        log.info("In UserService:delete - user with id {} successfully deleted", id);
+
     }
 
     @Override
@@ -96,7 +105,8 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new NotFoundEntityException(userRoleDto.getRoleId()));
 
         user.getRoles().add(role);
-        userRepository.saveAndFlush(user);
+        log.info("In UserService:addUserRole - role {} successfully added to user {}", role, user);
+
     }
 
     @Override
@@ -105,6 +115,8 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new NotFoundEntityException(userStatusDto.getUserId()))
                 .getUserProfile()
                 .setStatus(userStatusDto.getStatus());
+        log.info("In UserService:changeUserStatus - successfully set status {} to user with id {}  }", userStatusDto.getStatus(), userStatusDto.getUserId());
+
     }
 
     @Override
@@ -115,7 +127,8 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new NotFoundEntityException(userRoleDto.getRoleId()));
 
         user.getRoles().remove(role);
-        userRepository.saveAndFlush(user);
+        log.info("In UserService:deleteUserRole - role {} successfully deleted to user {}", role, user);
+
     }
 
     @Override
@@ -132,6 +145,8 @@ public class UserService implements IUserService {
             user.setPassword(passwordEncoder.encode(changeUserPasswordDto.getNewPassword()));
             user.getUserProfile().setUpdated(LocalDateTime.now());
         } else throw new AuthenticationServiceException("Incorrect password!");
+        log.info("In UserService:changeUserPassword - user {} successfully changed password", user);
+
     }
 
     @Override
@@ -142,17 +157,18 @@ public class UserService implements IUserService {
     @Override
     public void editUserProfile(EditUserProfileDto editUserProfileDto) {
         User user = userRepository.findByUsername(editUserProfileDto.getUsername());
-        if (!editUserProfileDto.getFirstName().isBlank()) {
+        if (editUserProfileDto.getFirstName() != null) {
             user.getUserProfile().setFirstName(editUserProfileDto.getFirstName());
         }
-        if (!editUserProfileDto.getLastName().isBlank()) {
+        if (editUserProfileDto.getLastName() != null) {
             user.getUserProfile().setLastName(editUserProfileDto.getLastName());
         }
-        if (!editUserProfileDto.getPhoneNumber().isBlank()) {
+        if (editUserProfileDto.getPhoneNumber() != null) {
             user.getUserProfile().setPhoneNumber(editUserProfileDto.getPhoneNumber());
         }
         user.getUserProfile().setUpdated(LocalDateTime.now());
-        userRepository.saveAndFlush(user);
+        log.info("In UserService:editUserProfile - user {} successfully edited profile", user);
+
     }
 
     @Override
@@ -166,8 +182,8 @@ public class UserService implements IUserService {
         passport.setDateOfExpire(editPassportDto.getDateOfExpire());
 
         user.getUserProfile().setUpdated(LocalDateTime.now());
-        userProfileRepository.saveAndFlush(user.getUserProfile());
-        userRepository.saveAndFlush(user);
+        log.info("In UserService:editPassport - user {} successfully edited passport {}", user, passport);
+
     }
 }
 

@@ -1,5 +1,6 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.user;
 
+import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
 import lombok.Data;
 
 import java.util.List;

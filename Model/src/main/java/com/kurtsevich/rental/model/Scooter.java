@@ -18,6 +18,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,9 @@ public class Scooter extends BaseEntity {
 
     @Column(name = "charge")
     private int charge;
+
+    @Column(name = "mileage")
+    private Long mileage;
 
     @CreationTimestamp
     @Column(name = "created")

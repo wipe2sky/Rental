@@ -29,6 +29,9 @@ public class History extends BaseEntity{
     @Column(name = "price")
     private BigDecimal price;
 
+    @Column(name = "distance")
+    private Long distance;
+
     @Column(name = "actual_discount")
     private BigDecimal actualDiscount;
 

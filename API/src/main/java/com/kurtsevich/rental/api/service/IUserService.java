@@ -1,22 +1,21 @@
 package com.kurtsevich.rental.api.service;
 
-import com.kurtsevich.rental.dto.ChangeUserPasswordDto;
-import com.kurtsevich.rental.dto.CreatedUserDto;
+import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
+import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.EditPassportDto;
-import com.kurtsevich.rental.dto.EditUserProfileDto;
-import com.kurtsevich.rental.dto.PassportDto;
-import com.kurtsevich.rental.dto.UserDto;
-import com.kurtsevich.rental.dto.UserProfileDto;
-import com.kurtsevich.rental.dto.UserRoleDto;
-import com.kurtsevich.rental.dto.UserStatusDto;
+import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.UserDto;
+import com.kurtsevich.rental.dto.user.UserRoleDto;
+import com.kurtsevich.rental.dto.user.UserStatusDto;
 import com.kurtsevich.rental.model.User;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface IUserService {
-    void register(CreatedUserDto createdUserDto);
+    void register(CreateUserDto createUserDto);
 
-    List<UserDto> getAll();
+    List<UserDto> getAll(Pageable page);
 
     UserDto getById(Long id);
 

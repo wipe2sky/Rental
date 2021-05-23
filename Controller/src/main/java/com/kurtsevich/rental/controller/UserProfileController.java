@@ -1,10 +1,10 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IUserService;
-import com.kurtsevich.rental.dto.ChangeUserPasswordDto;
-import com.kurtsevich.rental.dto.CreatedUserDto;
+import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
+import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.EditPassportDto;
-import com.kurtsevich.rental.dto.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.EditUserProfileDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,8 +24,8 @@ public class UserProfileController {
     private final IUserService userService;
 
     @PutMapping("/reg")
-    public ResponseEntity<Void> registration(@RequestBody CreatedUserDto createdUserDto) {
-        userService.register(createdUserDto);
+    public ResponseEntity<Void> registration(@RequestBody CreateUserDto createUserDto) {
+        userService.register(createUserDto);
         return ResponseEntity.noContent().build();
     }
 
