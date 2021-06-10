@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -49,16 +50,16 @@ public class Scooter extends BaseEntity {
     @JoinColumn(name = "scooter_model", nullable = false)
     private ScooterModel scooterModel;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_point")
     private RentalPoint rentalPoint;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "scooter_rent_terms",
-            joinColumns = {@JoinColumn(name = "scooter_id")},
-            inverseJoinColumns = {@JoinColumn(name = "rent_terms_id")})
-    private List<RentTerms> rentTermsList;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rent_terms")
+    private RentTerms rentTerms;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "scooter", fetch = FetchType.LAZY)
     private List<History> histories;
 }

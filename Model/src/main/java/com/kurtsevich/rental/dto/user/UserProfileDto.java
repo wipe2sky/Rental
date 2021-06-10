@@ -1,8 +1,8 @@
 package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
-import com.kurtsevich.rental.dto.history.HistoryWithoutUserProfileDto;
 import com.kurtsevich.rental.dto.PassportDto;
+import com.kurtsevich.rental.dto.history.HistoryWithoutUserProfileDto;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ public class UserProfileDto {
     private String lastName;
     private String phoneNumber;
     private PassportDto passport;
-    private BigDecimal discount;
+    private int discount;
     private BigDecimal prepayments;
     private List<HistoryWithoutUserProfileDto> histories;
 

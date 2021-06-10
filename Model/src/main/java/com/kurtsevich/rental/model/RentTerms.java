@@ -15,9 +15,6 @@ public class RentTerms extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "time_in_seconds")
-    private Long timeInSeconds;
-
     @Column(name = "price")
     private BigDecimal price;
 

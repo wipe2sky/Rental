@@ -10,6 +10,6 @@ public class CreateScooterDto {
     private Status status;
     private int charge;
     private Long mileage;
-    private List<Long> rentTermsId;
+    private Long rentTermsId;
     private Long rentalPointId;
 }

@@ -20,6 +20,7 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<String> handleNotFoundException(NotFoundEntityException ex) {
         log.error(ex.getMessage());
@@ -31,6 +32,7 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getMessage());
         return new ResponseEntity<>(ex.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
         log.error("IN handleAuthenticationException - invalid username or password");

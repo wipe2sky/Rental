@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.api.service;
 
+import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.EditPassportDto;
@@ -29,9 +30,13 @@ public interface IUserService {
 
     User findByUsername(String username);
 
+    UserDto findProfileByUsername(String username);
+
     void changeUserPassword(ChangeUserPasswordDto changeUserPasswordDto);
 
     void editUserProfile(EditUserProfileDto editUserProfileDto);
 
     void editPassport(EditPassportDto editPassportDto);
+
+    Long addPrepayments(AddPrepaymentsDto addPrepaymentsDto);
 }

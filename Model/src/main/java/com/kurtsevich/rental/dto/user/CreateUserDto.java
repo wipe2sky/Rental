@@ -1,14 +1,9 @@
 package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
-import com.kurtsevich.rental.model.Passport;
 import lombok.Data;
 
-import javax.persistence.Column;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Data
 public class CreateUserDto {

@@ -8,14 +8,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class HistoryDto {
-    private Long id;
+public class FinishedHistoryDto {
     private LocalDateTime created;
     private LocalDateTime finished;
     private Long distance;
-    private BigDecimal price;
-    private BigDecimal actualDiscount;
-    private boolean isActual;
+    private int travelTime;
+    private int actualDiscount;
+    private double price;
+    private double amountToPay;
     private ScooterWithoutHistoriesDto scooter;
     private UserProfileWithoutHistoriesDto userProfile;
 }

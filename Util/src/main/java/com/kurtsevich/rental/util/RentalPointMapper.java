@@ -12,11 +12,14 @@ public interface RentalPointMapper {
     RentalPointMapper INSTANCE = Mappers.getMapper(RentalPointMapper.class);
 
     RentalPointDto rentalPointToRentalPointDto(RentalPoint rentalPoint);
+
     RentalPoint rentalPointDtoToRentalPoint(RentalPointDto rentalPointDto);
 
     RentalPointWithDistanceDto rentalPointToRentalPointWithDistanceDto(RentalPoint rentalPoint);
+
     RentalPoint rentalPointWithDistanceDtoToRentalPoint(RentalPointWithDistanceDto rentalPointWithDistanceDto);
 
     RentalPointWithoutScootersDto rentalPointToRentalPointWithoutScootersDto(RentalPoint rentalPoint);
+
     RentalPoint rentalPointWithoutScootersDtoToRentalPoint(RentalPointWithoutScootersDto rentalPointWithoutScootersDto);
 }

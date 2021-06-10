@@ -9,6 +9,5 @@ import java.math.BigDecimal;
 public class RentTermsDto {
     private Long id;
     private String name;
-    private Long timeInSeconds;
     private BigDecimal price;
 }

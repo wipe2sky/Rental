@@ -8,6 +8,7 @@ import com.kurtsevich.rental.api.repository.RoleRepository;
 import com.kurtsevich.rental.api.repository.UserProfileRepository;
 import com.kurtsevich.rental.api.repository.UserRepository;
 import com.kurtsevich.rental.api.service.IUserService;
+import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.EditPassportDto;
@@ -19,8 +20,8 @@ import com.kurtsevich.rental.model.Passport;
 import com.kurtsevich.rental.model.Role;
 import com.kurtsevich.rental.model.User;
 import com.kurtsevich.rental.model.UserProfile;
-import com.kurtsevich.rental.util.CreateUserMapper;
 import com.kurtsevich.rental.util.UserMapper;
+import com.kurtsevich.rental.util.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -45,24 +46,23 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final PassportRepository passportRepository;
     private final UserMapper userMapper;
-    private final CreateUserMapper createUserMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public void register(CreateUserDto createUserDto) {
-        User user = createUserMapper.CreatedUserDtoToUser(createUserDto);
-        UserProfile userProfile = createUserMapper.CreatedUserDtoToUserProfile(createUserDto);
+        User user = userMapper.CreatedUserDtoToUser(createUserDto);
+        UserProfile userProfile = userMapper.CreatedUserDtoToUserProfile(createUserDto);
         user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         userRepository.saveAndFlush(user);
 
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
 
-        Passport passport = createUserMapper.CreatedUserDtoToPassport(createUserDto);
+        Passport passport = userMapper.CreatedUserDtoToPassport(createUserDto);
         passportRepository.saveAndFlush(passport);
 
         userProfile.setUser(user);
         userProfile.setPassport(passport);
-        userProfile.setDiscount(new BigDecimal(0));
+        userProfile.setDiscount(0);
         userProfile.setPrepayments(new BigDecimal(0));
         userProfileRepository.saveAndFlush(userProfile);
 
@@ -155,6 +155,16 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserDto findProfileByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if(user != null) {
+            return userMapper.userToUserDto(user);
+        } else {
+            throw new ServiceException("Can't find user with username " + username);
+        }
+    }
+
+    @Override
     public void editUserProfile(EditUserProfileDto editUserProfileDto) {
         User user = userRepository.findByUsername(editUserProfileDto.getUsername());
         if (editUserProfileDto.getFirstName() != null) {
@@ -166,7 +176,6 @@ public class UserService implements IUserService {
         if (editUserProfileDto.getPhoneNumber() != null) {
             user.getUserProfile().setPhoneNumber(editUserProfileDto.getPhoneNumber());
         }
-        user.getUserProfile().setUpdated(LocalDateTime.now());
         log.info("In UserService:editUserProfile - user {} successfully edited profile", user);
 
     }
@@ -184,6 +193,17 @@ public class UserService implements IUserService {
         user.getUserProfile().setUpdated(LocalDateTime.now());
         log.info("In UserService:editPassport - user {} successfully edited passport {}", user, passport);
 
+    }
+
+    @Override
+    public Long addPrepayments(AddPrepaymentsDto addPrepaymentsDto) {
+        UserProfile userProfile = userRepository.findByUsername(addPrepaymentsDto.getUsername()).getUserProfile();
+        BigDecimal pay = BigDecimal.valueOf(addPrepaymentsDto.getPrepayments() * 2);
+        BigDecimal prepayments = userProfile.getPrepayments().add(pay);
+        userProfile.setPrepayments(prepayments);
+
+        log.info("IN UserService:addPrepayments - add prepayments {} to user {}", pay, addPrepaymentsDto.getUsername());
+        return prepayments.longValue();
     }
 }
 

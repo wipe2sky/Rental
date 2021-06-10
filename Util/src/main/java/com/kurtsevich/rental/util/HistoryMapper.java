@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.util;
 
+import com.kurtsevich.rental.dto.history.FinishedHistoryDto;
 import com.kurtsevich.rental.dto.history.HistoryDto;
 import com.kurtsevich.rental.dto.history.HistoryWithoutScooterDto;
 import com.kurtsevich.rental.dto.history.HistoryWithoutUserProfileDto;
@@ -13,9 +14,12 @@ public interface HistoryMapper {
 
     HistoryDto historyToHistoryDto(History history);
     History historyDtoToHistory(HistoryDto historyDto);
+
     HistoryWithoutScooterDto historyToHistoryWithoutScooterDto(History history);
     History historyWithoutScooterDtoToHistory(HistoryWithoutScooterDto historyWithoutScooterDto);
+
     HistoryWithoutUserProfileDto historyToHistoryWithoutUserProfileDto(History history);
     History historyWithoutUserProfileDtoToHistory(HistoryWithoutUserProfileDto historyWithoutUserProfileDto);
 
+    FinishedHistoryDto historyToHFinishedHistoryDto(History history);
 }

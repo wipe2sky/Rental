@@ -23,7 +23,6 @@ import java.util.List;
 
 @Entity
 @Data
-@ToString(exclude = "user")
 @Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)
@@ -48,7 +47,7 @@ public class UserProfile extends BaseEntity {
     private String lastName;
 
     @Column(name = "discount")
-    private BigDecimal discount;
+    private int discount;
 
     @Column(name = "prepayments")
     private BigDecimal prepayments;
@@ -57,10 +56,11 @@ public class UserProfile extends BaseEntity {
     @JoinColumn(name = "passport")
     private Passport passport;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user", nullable = false)
     private User user;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY)
     private List<History> histories;
 }

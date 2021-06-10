@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:20.1.0'
     implementation(project(':API'))
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
 

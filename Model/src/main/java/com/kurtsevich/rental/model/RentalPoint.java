@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.geo.Point;
 
 import javax.persistence.Column;

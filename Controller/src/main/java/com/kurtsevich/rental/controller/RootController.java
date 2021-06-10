@@ -47,6 +47,7 @@ public class RootController {
     public ResponseEntity<Void> addUser(@RequestBody CreateUserDto createUserDto){
         userService.register(createUserDto);
         return ResponseEntity.noContent().build();
+
     }
 
     @DeleteMapping("/users/{id}")

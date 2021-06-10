@@ -12,9 +12,14 @@ public interface UserProfileMapper {
     UserProfileMapper INSTANCE = Mappers.getMapper(UserProfileMapper.class);
 
     UserProfileDto userProfileToUserProfileDto(UserProfile userProfile);
+
     UserProfile userProfileDtoToUserProfile(UserProfileDto userProfileDto);
+
     UserProfileWithoutHistoriesDto userProfileToUserProfileWithoutHistoriesDto(UserProfile userProfile);
+
     UserProfile userProfileWithoutHistoriesDtoToUserProfile(UserProfileWithoutHistoriesDto userProfileWithoutHistoriesDto);
+
     EditUserProfileDto userProfileToEditUserProfileDto(UserProfile userProfile);
+
     UserProfile EditUserProfileDtoToUserProfile(EditUserProfileDto editUserProfileDto);
 }

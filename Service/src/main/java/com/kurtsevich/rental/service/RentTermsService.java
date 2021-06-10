@@ -45,10 +45,6 @@ public class RentTermsService implements IRentTermsService {
         if (rentTermsDto.getPrice() != null) {
             rentTerms.setPrice(rentTermsDto.getPrice());
         }
-
-        if (rentTermsDto.getTimeInSeconds() != null) {
-            rentTerms.setTimeInSeconds(rentTermsDto.getTimeInSeconds());
-        }
         log.info("IN RentTermsService:update - rent terms id {} is updated", id);
     }
 

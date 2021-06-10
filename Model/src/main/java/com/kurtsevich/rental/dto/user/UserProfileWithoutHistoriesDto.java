@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class UserProfileWithoutHistoriesDto {
@@ -17,6 +16,6 @@ public class UserProfileWithoutHistoriesDto {
     private String lastName;
     private String phoneNumber;
     private PassportDto passport;
-    private BigDecimal discount;
+    private int discount;
     private BigDecimal prepayments;
 }

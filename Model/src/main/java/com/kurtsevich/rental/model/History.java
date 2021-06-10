@@ -33,12 +33,12 @@ public class History extends BaseEntity{
     private Long distance;
 
     @Column(name = "actual_discount")
-    private BigDecimal actualDiscount;
+    private int actualDiscount;
 
     @Column(name = "is_actual")
     private boolean isActual;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "scooter")
     private Scooter scooter;
 
