@@ -12,7 +12,7 @@ import com.kurtsevich.rental.dto.scooter.ScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.model.Scooter;
 import com.kurtsevich.rental.model.ScooterModel;
-import com.kurtsevich.rental.util.ScooterMapper;
+import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -85,10 +85,8 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterDto> findAllScootersByModelId(Long id, Pageable page) {
-        ScooterModel scooterModel = scooterModelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(id));
-        return scooterRepository.findAllByScooterModel(scooterModel, page).stream()
+    public List<ScooterDto> findAllScootersByModelId(Long scooterModelId, Pageable page) {
+        return scooterRepository.findAllByScooterModelId(scooterModelId, page).stream()
                 .map(scooterMapper::scooterToScooterDto)
                 .collect(Collectors.toList());
     }

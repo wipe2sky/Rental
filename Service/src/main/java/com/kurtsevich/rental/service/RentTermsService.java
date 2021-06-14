@@ -5,7 +5,7 @@ import com.kurtsevich.rental.api.repository.RentTermsRepository;
 import com.kurtsevich.rental.api.service.IRentTermsService;
 import com.kurtsevich.rental.dto.RentTermsDto;
 import com.kurtsevich.rental.model.RentTerms;
-import com.kurtsevich.rental.util.RentTermsMapper;
+import com.kurtsevich.rental.util.mapper.RentTermsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +39,10 @@ public class RentTermsService implements IRentTermsService {
     @Override
     public void update(Long id, RentTermsDto rentTermsDto) {
         RentTerms rentTerms = rentTermsRepository.findById(id).orElseThrow(() -> new NotFoundEntityException(id));
-        if (rentTermsDto.getName() != null) {
-            rentTerms.setName(rentTermsDto.getName());
+        if (rentTerms == null) {
+            throw new NotFoundEntityException(id);
         }
-        if (rentTermsDto.getPrice() != null) {
-            rentTerms.setPrice(rentTermsDto.getPrice());
-        }
-        log.info("IN RentTermsService:update - rent terms id {} is updated", id);
+        rentTermsMapper.update(rentTerms, rentTermsDto);
     }
 
     @Override

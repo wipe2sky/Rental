@@ -2,7 +2,7 @@ package com.kurtsevich.rental.security;
 
 import com.kurtsevich.rental.security.jwt.JwtConfigurer;
 import com.kurtsevich.rental.security.jwt.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,16 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
         prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ENDPOINT = "/admin/**";
     private static final String LOGIN_ENDPOINT = "/auth/login";
     private static final String REGISTRATION_ENDPOINT = "/users/reg";
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     @Bean
     @Override

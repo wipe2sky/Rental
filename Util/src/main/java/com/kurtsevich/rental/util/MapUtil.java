@@ -8,10 +8,7 @@ public class MapUtil {
         return d * Math.PI / 180.00; // Преобразовать угол в радианы
     }
 
-    /*
-     * Рассчитать расстояние между двумя точками на основе широты и долготы (в метрах)
-     */
-    public static double getDistanceInMeters(double longitude1, double latitude1, double longitude2, double latitude2) {
+    public static long getDistanceInMeters(double longitude1, double latitude1, double longitude2, double latitude2) {
 
         double lat1 = rad (latitude1); // Широта
 
@@ -27,11 +24,7 @@ public class MapUtil {
 
         s = s * 6378137.0; // длина дуги, умноженная на радиус земли (радиус в метрах)
 
-        s = Math.round (s * 10000d) / 10000d; // Точное значение расстояния
-        // округлить до одного знака после запятой
-        //DecimalFormat df = new DecimalFormat("#.0");
-
-        return s;
+        return Math.round(s);
 
     }
 }

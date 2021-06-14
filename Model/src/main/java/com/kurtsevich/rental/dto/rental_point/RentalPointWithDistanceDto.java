@@ -11,5 +11,5 @@ public class RentalPointWithDistanceDto {
     private int streetAddressNumber;
     private char streetAddressNumberSuffix;
     private String phoneNumber;
-    private int distance;
+    private long distance;
 }

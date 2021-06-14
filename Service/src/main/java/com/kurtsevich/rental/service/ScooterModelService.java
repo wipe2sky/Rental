@@ -7,7 +7,7 @@ import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.service.IScooterModelService;
 import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
 import com.kurtsevich.rental.model.ScooterModel;
-import com.kurtsevich.rental.util.ScooterModelMapper;
+import com.kurtsevich.rental.util.mapper.ScooterModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -64,21 +64,7 @@ public class ScooterModelService implements IScooterModelService {
         if (scooterModel == null) {
             throw new NotFoundEntityException(scooterModelDto.getModel());
         }
-        if (scooterModelDto.getName() != null) {
-            scooterModel.setName(scooterModelDto.getName());
-        }
-        if (scooterModelDto.getMaxSpeed() != 0) {
-            scooterModel.setMaxSpeed(scooterModelDto.getMaxSpeed());
-        }
-        if (scooterModelDto.getPower() != 0) {
-            scooterModel.setPower(scooterModelDto.getPower());
-        }
-        if (scooterModelDto.getWeight() != null) {
-            scooterModel.setWeight(scooterModelDto.getWeight());
-        }
-        if (scooterModelDto.getWeightLimit() != 0) {
-            scooterModel.setWeightLimit(scooterModelDto.getWeightLimit());
-        }
+        mapper.update(scooterModel, scooterModelDto);
         log.info("IN ScooterModelService:add - scooterModel {} updated", scooterModel);
 
     }

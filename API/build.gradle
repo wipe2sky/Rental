@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile(project(':Util'))
+    compile (project(':Util'))
 }
 
 test {

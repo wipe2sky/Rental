@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.util;
+package com.kurtsevich.rental.util.mapper;
 
 import com.kurtsevich.rental.dto.rental_point.RentalPointDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;

@@ -4,7 +4,6 @@ import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.dto.user.UserProfileWithoutHistoriesDto;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data

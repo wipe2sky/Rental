@@ -34,20 +34,20 @@ public class HistoryController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @PutMapping
-    ResponseEntity<Void> createHistory(@RequestBody UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
+    public ResponseEntity<Void> createHistory(@RequestBody UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
         historyService.createHistory(userProfileScooterAndPriceDto);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @PutMapping("/finish")
-    ResponseEntity<FinishedHistoryDto> finishedTrip(@Valid @RequestBody FinishedTripDto finishedTripDto) {
+    public ResponseEntity<FinishedHistoryDto> finishedTrip(@Valid @RequestBody FinishedTripDto finishedTripDto) {
         return ResponseEntity.ok(historyService.finishHistory(finishedTripDto));
     }
 
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/users")
-    ResponseEntity<List<HistoryDto>> findAllHistoryByUsername(@RequestParam("username") String username,
+    public ResponseEntity<List<HistoryDto>> findAllHistoryByUsername(@RequestParam("username") String username,
                                                               @RequestParam("page") int page,
                                                               @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -56,14 +56,14 @@ public class HistoryController {
 
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/actual")
-    ResponseEntity<HistoryDto> findActualHistoryByUsername(@RequestParam("username") String username) {
+    public ResponseEntity<HistoryDto> findActualHistoryByUsername(@RequestParam("username") String username) {
         return ResponseEntity.ok(historyService.findActualHistoryByUsername(username));
     }
 
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/scooters/{id}")
-    ResponseEntity<List<HistoryDto>> findByScooterId(@PathVariable Long id,
+    public ResponseEntity<List<HistoryDto>> findByScooterId(@PathVariable Long id,
                                                               @RequestParam("page") int page,
                                                               @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -73,7 +73,7 @@ public class HistoryController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/date")
-    ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("date") String date,
+    public ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("date") String date,
                                                               @RequestParam("page") int page,
                                                               @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);

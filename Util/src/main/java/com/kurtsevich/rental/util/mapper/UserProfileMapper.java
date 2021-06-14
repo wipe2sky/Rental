@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.util;
+package com.kurtsevich.rental.util.mapper;
 
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserProfileDto;
@@ -21,5 +21,5 @@ public interface UserProfileMapper {
 
     EditUserProfileDto userProfileToEditUserProfileDto(UserProfile userProfile);
 
-    UserProfile EditUserProfileDtoToUserProfile(EditUserProfileDto editUserProfileDto);
+    UserProfile editUserProfileDtoToUserProfile(EditUserProfileDto editUserProfileDto);
 }

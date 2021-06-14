@@ -1,20 +1,17 @@
 package com.kurtsevich.rental.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kurtsevich.rental.model.UserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Date;
 
 @RequiredArgsConstructor
 public class JwtUser implements UserDetails {
     private final Long id;
     private final String username;
     private final String password;
-    private final UserProfile userProfile;
     private final boolean enabled;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -32,10 +29,6 @@ public class JwtUser implements UserDetails {
     @Override
     public String getPassword() {
         return password;
-    }
-
-    public UserProfile getUserProfile() {
-        return userProfile;
     }
 
     @JsonIgnore

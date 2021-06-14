@@ -2,11 +2,8 @@ package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
-import lombok.ToString;
-import org.springframework.data.geo.Point;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,7 +15,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "rental_point")
-public class RentalPoint extends BaseEntity{
+public class RentalPoint extends BaseEntity {
     @Column(name = "name")
     private String name;
 

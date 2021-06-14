@@ -1,9 +1,9 @@
 package com.kurtsevich.rental.api.service;
 
+import com.kurtsevich.rental.dto.EditPassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.EditPassportDto;
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;

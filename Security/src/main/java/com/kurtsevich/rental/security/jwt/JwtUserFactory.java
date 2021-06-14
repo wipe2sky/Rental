@@ -12,13 +12,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class JwtUserFactory {
+    private JwtUserFactory() {
+    }
 
     public static JwtUser create(User user) {
         return new JwtUser(
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
-                user.getUserProfile(),
                 user.getUserProfile().getStatus().equals(Status.ACTIVE),
                 mapToGrantedAuthorities(new ArrayList<>( user.getRoles()))
         );

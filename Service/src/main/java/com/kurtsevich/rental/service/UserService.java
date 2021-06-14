@@ -20,8 +20,7 @@ import com.kurtsevich.rental.model.Passport;
 import com.kurtsevich.rental.model.Role;
 import com.kurtsevich.rental.model.User;
 import com.kurtsevich.rental.model.UserProfile;
-import com.kurtsevich.rental.util.UserMapper;
-import com.kurtsevich.rental.util.UserProfileMapper;
+import com.kurtsevich.rental.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -50,14 +49,14 @@ public class UserService implements IUserService {
 
     @Override
     public void register(CreateUserDto createUserDto) {
-        User user = userMapper.CreatedUserDtoToUser(createUserDto);
-        UserProfile userProfile = userMapper.CreatedUserDtoToUserProfile(createUserDto);
+        User user = userMapper.createdUserDtoToUser(createUserDto);
+        UserProfile userProfile = userMapper.createdUserDtoToUserProfile(createUserDto);
         user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         userRepository.saveAndFlush(user);
 
         user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
 
-        Passport passport = userMapper.CreatedUserDtoToPassport(createUserDto);
+        Passport passport = userMapper.createdUserDtoToPassport(createUserDto);
         passportRepository.saveAndFlush(passport);
 
         userProfile.setUser(user);
@@ -150,6 +149,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

@@ -4,6 +4,8 @@ plugins {
 
 group 'com.kurtsevich'
 version '0.0.1-SNAPSHOT'
+def mapstructVersion = '1.4.2.Final'
+def mySqlVersion = '8.0.22'
 
 repositories {
     mavenCentral()
@@ -18,9 +20,9 @@ compileJava {
 
 dependencies {
     compile (project(':Model'))
-    implementation 'mysql:mysql-connector-java:8.0.22'
-    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.2.Final'
-    annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.4.2.Final'
+    implementation "mysql:mysql-connector-java:${mySqlVersion}"
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
 }
 

@@ -20,5 +20,5 @@ public interface IScooterService {
 
     void deleteRentTermsAtScooter(ScooterRentTermsDto scooterRentTermsDto);
 
-    List<ScooterDto> findAllScootersByModelId(Long id, Pageable page);
+    List<ScooterDto> findAllScootersByModelId(Long scooterModelId, Pageable page);
 }

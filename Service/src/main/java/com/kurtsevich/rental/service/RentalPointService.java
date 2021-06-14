@@ -10,15 +10,14 @@ import com.kurtsevich.rental.dto.rental_point.RentalPointDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointScooterDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithoutScootersDto;
-import com.kurtsevich.rental.dto.scooter.ScooterDto;
+import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.model.RentalPoint;
 import com.kurtsevich.rental.model.Scooter;
 import com.kurtsevich.rental.util.MapUtil;
-import com.kurtsevich.rental.util.RentalPointMapper;
-import com.kurtsevich.rental.util.ScooterMapper;
+import com.kurtsevich.rental.util.mapper.RentalPointMapper;
+import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -40,14 +39,16 @@ public class RentalPointService implements IRentalPointService {
 
     @Override
     public void add(RentalPointWithoutScootersDto rentalPointWithoutScootersDto) {
-        RentalPoint rentalPoint = rentalPointMapper.rentalPointWithoutScootersDtoToRentalPoint(rentalPointWithoutScootersDto);
+        RentalPoint rentalPoint = rentalPointMapper
+                .rentalPointWithoutScootersDtoToRentalPoint(rentalPointWithoutScootersDto);
         rentalPointRepository.saveAndFlush(rentalPoint);
         log.info("IN RentalPointService:add - rental point {} successfully created", rentalPoint);
     }
 
     @Override
     public RentalPointDto getById(Long id) {
-        return rentalPointMapper.rentalPointToRentalPointDto(rentalPointRepository.findById(id)
+        return rentalPointMapper
+                .rentalPointToRentalPointDto(rentalPointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id)));
     }
 
@@ -61,7 +62,8 @@ public class RentalPointService implements IRentalPointService {
 
     @Override
     public void delete(Long id) {
-        RentalPoint rentalPoint = rentalPointRepository.findById(id).orElseThrow(() -> new NotFoundEntityException(id));
+        RentalPoint rentalPoint = rentalPointRepository
+                .findById(id).orElseThrow(() -> new NotFoundEntityException(id));
         rentalPoint.setStatus(Status.DELETED);
         rentalPoint.getScooters()
                 .forEach(scooter -> {
@@ -112,7 +114,7 @@ public class RentalPointService implements IRentalPointService {
 
         RentalPoint rentalPoint = rentalPointRepository.findById(rentalPointScooterDto.getRentalPointId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getRentalPointId()));
-        if(rentalPoint.getScooters().contains(scooter)) {
+        if(rentalPoint.getScooters().contains(scooter) && Status.ACTIVE.equals(scooter.getStatus())) {
             scooter.setRentalPoint(null);
             scooter.setStatus(Status.NOT_ACTIVE);
         }else {
@@ -123,20 +125,15 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
-    public List<ScooterDto> getScootersInRentalPointByStatus(Long id, Status status, Pageable page) {
-        RentalPoint rentalPoint = rentalPointRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(id));
-
-        return scooterRepository.findAllByRentalPointAndStatus(rentalPoint, status, page).stream()
-                .map(scooterMapper::scooterToScooterDto)
+    public List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, Pageable page) {
+        return scooterRepository.findAllByRentalPointIdAndStatusOrderById(rentalPointId, status, page).stream()
+                .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public int getCountScootersInRentalPointByStatus(Long id, Status status) {
-        RentalPoint rentalPoint = rentalPointRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(id));
-        return scooterRepository.countByRentalPointAndStatus(rentalPoint, status);
+    public int getCountScootersInRentalPointByStatus(Long rentalPointId, Status status) {
+        return scooterRepository.countByRentalPointIdAndStatus(rentalPointId, status);
     }
 
     @Override
@@ -145,8 +142,10 @@ public class RentalPointService implements IRentalPointService {
         List<RentalPointWithDistanceDto> result = new ArrayList<>();
         rentalPoints.forEach(rp -> {
             if (rp.getStatus().equals(Status.ACTIVE)) {
-                RentalPointWithDistanceDto actualDto = rentalPointMapper.rentalPointToRentalPointWithDistanceDto(rp);
-                actualDto.setDistance((int) MapUtil.getDistanceInMeters(longitude, latitude, rp.getLongitude(), rp.getLatitude()));
+                RentalPointWithDistanceDto actualDto = rentalPointMapper
+                        .rentalPointToRentalPointWithDistanceDto(rp);
+                actualDto.setDistance( MapUtil
+                        .getDistanceInMeters(longitude, latitude, rp.getLongitude(), rp.getLatitude()));
                 result.add(actualDto);
             }
         });

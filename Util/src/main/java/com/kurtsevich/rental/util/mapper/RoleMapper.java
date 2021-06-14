@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.util;
+package com.kurtsevich.rental.util.mapper;
 
 import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
 import com.kurtsevich.rental.model.Role;

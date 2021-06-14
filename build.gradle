@@ -8,6 +8,11 @@ plugins {
 group = 'com.kurtsevich'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '15'
+ext {
+    springBootVersion = '2.5.1'
+}
+
+def lombokVersion = '1.18.16'
 
 configurations {
     compileOnly {
@@ -22,20 +27,16 @@ repositories {
 allprojects {
     apply plugin: 'java'
     dependencies {
-        compileOnly 'org.projectlombok:lombok:1.18.16'
-        annotationProcessor 'org.projectlombok:lombok:1.18.16'
-        testCompileOnly 'org.projectlombok:lombok:1.18.16'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
-
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.5'
-
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     }
 }
 
 dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 
-    compile(project(':Controller'))
-    compile(project(':Service'))
+    implementation(project(':Controller'))
+    implementation(project(':Service'))
 }
 
 test {

@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.util;
+package com.kurtsevich.rental.util.mapper;
 
 import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.user.UserDto;
@@ -16,9 +16,9 @@ public interface UserMapper {
 
     User userDtoToUser(UserDto userDto);
 
-    UserProfile CreatedUserDtoToUserProfile(CreateUserDto createUserDto);
+    UserProfile createdUserDtoToUserProfile(CreateUserDto createUserDto);
 
-    User CreatedUserDtoToUser(CreateUserDto createUserDto);
+    User createdUserDtoToUser(CreateUserDto createUserDto);
 
-    Passport CreatedUserDtoToPassport(CreateUserDto createUserDto);
+    Passport createdUserDtoToPassport(CreateUserDto createUserDto);
 }

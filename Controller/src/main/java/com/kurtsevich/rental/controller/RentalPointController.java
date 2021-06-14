@@ -6,7 +6,7 @@ import com.kurtsevich.rental.dto.rental_point.RentalPointDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointScooterDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithoutScootersDto;
-import com.kurtsevich.rental.dto.scooter.ScooterDto;
+import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +37,7 @@ public class RentalPointController {
         rentalPointService.add(rentalPointWithoutScootersDto);
         return ResponseEntity.noContent().build();
     }
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/{id}")
     public ResponseEntity<RentalPointDto> getById(@PathVariable Long id) {
@@ -74,10 +75,10 @@ public class RentalPointController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/{id}/scooters/status")
-    public ResponseEntity<List<ScooterDto>> getScootersByStatusSortBy(@PathVariable Long id,
-                                                                      @RequestParam("page") int page,
-                                                                      @RequestParam("size") int size,
-                                                                      @RequestParam("status") String status) {
+    public ResponseEntity<List<ScooterWithoutHistoriesDto>> getScootersByStatusSortBy(@PathVariable Long id,
+                                                                                      @RequestParam("page") int page,
+                                                                                      @RequestParam("size") int size,
+                                                                                      @RequestParam("status") String status) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(rentalPointService.getScootersInRentalPointByStatus(id, Status.valueOf(status), pageable));
     }
@@ -97,14 +98,14 @@ public class RentalPointController {
 
     @PutMapping("/{id}/phones")
     public ResponseEntity<Void> changePhone(@PathVariable Long id,
-                                            @RequestParam("phone") String phone){
+                                            @RequestParam("phone") String phone) {
         rentalPointService.updatePhoneNumber(id, phone);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(@PathVariable Long id,
-                                            @RequestParam("status") String status){
+                                             @RequestParam("status") String status) {
         rentalPointService.updateStatus(id, Status.valueOf(status));
         return ResponseEntity.noContent().build();
     }

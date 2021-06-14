@@ -1,14 +1,12 @@
 package com.kurtsevich.rental.security.jwt;
 
-import com.kurtsevich.rental.Status;
-import com.kurtsevich.rental.api.repository.UserRepository;
 import com.kurtsevich.rental.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,20 +18,20 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+    private final UserDetailsService userDetailsService;
+
     @Value("${jwt.token.secret}")
     private String secret;
     @Value("${jwt.token.expired}")
     private Long validityInMilliseconds;
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
