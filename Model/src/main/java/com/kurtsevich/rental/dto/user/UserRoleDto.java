@@ -6,8 +6,9 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class UserRoleDto {
-    @NotNull
+    @NotNull(message = "userId must not be null")
     private Long userId;
-    @NotNull
+
+    @NotNull(message = "roleId must not be null")
     private Long roleId;
 }

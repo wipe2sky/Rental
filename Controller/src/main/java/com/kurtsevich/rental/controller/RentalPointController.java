@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +21,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/rent-points")
 @RequiredArgsConstructor
-@Validated
 public class RentalPointController {
     private final IRentalPointService rentalPointService;
 
     @PutMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> add(@RequestBody RentalPointWithoutScootersDto rentalPointWithoutScootersDto) {
+    public ResponseEntity<Void> add(@RequestBody @Valid RentalPointWithoutScootersDto rentalPointWithoutScootersDto) {
         rentalPointService.add(rentalPointWithoutScootersDto);
         return ResponseEntity.noContent().build();
     }
@@ -53,14 +52,14 @@ public class RentalPointController {
 
     @PutMapping("/scooters")
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> addScooter(@RequestBody RentalPointScooterDto rentalPointScooterDto) {
+    public ResponseEntity<Void> addScooter(@RequestBody @Valid RentalPointScooterDto rentalPointScooterDto) {
         rentalPointService.addScooterToRentalPoint(rentalPointScooterDto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/scooters")
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> removeScooter(@RequestBody RentalPointScooterDto rentalPointScooterDto) {
+    public ResponseEntity<Void> removeScooter(@RequestBody @Valid RentalPointScooterDto rentalPointScooterDto) {
         rentalPointService.removeScooterFromRentalPoint(rentalPointScooterDto);
         return ResponseEntity.noContent().build();
     }

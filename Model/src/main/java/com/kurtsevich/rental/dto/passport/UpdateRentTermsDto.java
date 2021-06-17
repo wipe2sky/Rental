@@ -1,12 +1,11 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.passport;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class RentTermsDto {
-    private Long id;
+public class UpdateRentTermsDto {
     private String name;
     private BigDecimal price;
 }

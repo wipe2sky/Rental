@@ -1,5 +1,8 @@
 package com.kurtsevich.rental.util;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class MapUtil {
     private MapUtil() {
     }

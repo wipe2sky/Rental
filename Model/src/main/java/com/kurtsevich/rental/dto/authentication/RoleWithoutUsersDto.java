@@ -1,17 +1,16 @@
-package com.kurtsevich.rental.dto;
+package com.kurtsevich.rental.dto.authentication;
 
 import com.kurtsevich.rental.Status;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Data
 public class RoleWithoutUsersDto {
-    @NotNull
+    @NotBlank(message = "name must not be null")
     private String name;
-    private LocalDate created;
-    private LocalDate updated;
-    @NotNull
+
+    @NotNull(message = "status must not be null")
     private Status status;
 }

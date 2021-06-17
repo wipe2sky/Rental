@@ -13,6 +13,6 @@ public class HistoryWithoutScooterDto {
     private Long distance;
     private BigDecimal price;
     private BigDecimal actualDiscount;
-    private boolean isActual;
+    private Boolean isActual;
     private UserProfileWithoutHistoriesDto userProfile;
 }

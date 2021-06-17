@@ -18,7 +18,7 @@ public interface IScooterService {
 
     void addRentTermsToScooter(ScooterRentTermsDto scooterRentTermsDto);
 
-    void deleteRentTermsAtScooter(ScooterRentTermsDto scooterRentTermsDto);
+    void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto);
 
     List<ScooterDto> findAllScootersByModelId(Long scooterModelId, Pageable page);
 }

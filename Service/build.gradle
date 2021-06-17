@@ -11,9 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(':API'))
-    implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
-
-//    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.6'
+    implementation(project(':Security'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'

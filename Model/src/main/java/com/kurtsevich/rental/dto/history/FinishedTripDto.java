@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class FinishedTripDto {
-    @NotNull
+    @NotNull(message = "userProfileId must not be null")
     private Long userProfileId;
-    @NotNull
+    @NotNull(message = "mileage must not be null")
     private Long mileage;
-    @NotNull
-    private int charge;
+    @NotNull(message = "charge must not be null")
+    private Integer charge;
 }

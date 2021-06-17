@@ -3,7 +3,8 @@ package com.kurtsevich.rental.service;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
 import com.kurtsevich.rental.api.repository.RentTermsRepository;
 import com.kurtsevich.rental.api.service.IRentTermsService;
-import com.kurtsevich.rental.dto.RentTermsDto;
+import com.kurtsevich.rental.dto.passport.RentTermsDto;
+import com.kurtsevich.rental.dto.passport.UpdateRentTermsDto;
 import com.kurtsevich.rental.model.RentTerms;
 import com.kurtsevich.rental.util.mapper.RentTermsMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,15 +35,19 @@ public class RentTermsService implements IRentTermsService {
     public void delete(Long id) {
         rentTermsRepository.delete(rentTermsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id)));
+        log.info("IN RentTermsService:delete - Rent term id {} deleted successfully", id);
+
     }
 
     @Override
-    public void update(Long id, RentTermsDto rentTermsDto) {
+    public void update(Long id, UpdateRentTermsDto rentTermsDto) {
         RentTerms rentTerms = rentTermsRepository.findById(id).orElseThrow(() -> new NotFoundEntityException(id));
         if (rentTerms == null) {
             throw new NotFoundEntityException(id);
         }
         rentTermsMapper.update(rentTerms, rentTermsDto);
+        log.info("IN RentTermsService:update - Rent term id {} upadated successfully", id);
+
     }
 
     @Override

@@ -4,8 +4,8 @@ import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
 import com.kurtsevich.rental.api.service.IUserService;
 import com.kurtsevich.rental.model.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,14 +13,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class JwtUsersDetailsService implements UserDetailsService {
-    private final IUserService userService;
+    private IUserService userService;
+
+    public JwtUsersDetailsService(@Lazy IUserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUsername(username);
-        if(user == null){
+        if (user == null) {
             throw new NotFoundEntityException(username);
         }
 

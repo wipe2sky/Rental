@@ -3,7 +3,7 @@ package com.kurtsevich.rental.controller;
 import com.kurtsevich.rental.api.service.IRoleService;
 import com.kurtsevich.rental.api.service.IUserService;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
+import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
 import com.kurtsevich.rental.dto.user.UserStatusDto;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@Validated
 public class RootController {
     private final IUserService userService;
     private final IRoleService roleService;
@@ -44,7 +42,7 @@ public class RootController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<Void> addUser(@RequestBody CreateUserDto createUserDto){
+    public ResponseEntity<Void> addUser(@RequestBody @Valid CreateUserDto createUserDto){
         userService.register(createUserDto);
         return ResponseEntity.noContent().build();
 
@@ -57,17 +55,17 @@ public class RootController {
     }
 
     @PutMapping("/users/role")
-    public ResponseEntity<Void> addUserRole(@Valid @RequestBody UserRoleDto userRoleDto){
+    public ResponseEntity<Void> addUserRole(@RequestBody @Valid UserRoleDto userRoleDto){
         userService.addUserRole(userRoleDto);
         return ResponseEntity.noContent().build();
     }
     @PutMapping("/role")
-    public ResponseEntity<Void> addRole(@Valid @RequestBody RoleWithoutUsersDto roleWithoutUsersDto){
+    public ResponseEntity<Void> addRole(@RequestBody @Valid RoleWithoutUsersDto roleWithoutUsersDto){
         roleService.add(roleWithoutUsersDto);
         return ResponseEntity.noContent().build();
     }
     @PutMapping("/users/status")
-    public ResponseEntity<Void> changeUserStatus(@Valid @RequestBody UserStatusDto userStatusDto){
+    public ResponseEntity<Void> changeUserStatus(@RequestBody @Valid UserStatusDto userStatusDto){
         userService.changeUserStatus(userStatusDto);
         return ResponseEntity.noContent().build();
     }
@@ -78,7 +76,7 @@ public class RootController {
 
     }
     @DeleteMapping("/users/role")
-    public ResponseEntity<Void> deleteUserRole(@Valid @RequestBody UserRoleDto userRoleDto){
+    public ResponseEntity<Void> deleteUserRole(@RequestBody @Valid UserRoleDto userRoleDto){
         userService.deleteUserRole(userRoleDto);
         return ResponseEntity.noContent().build();
     }

@@ -11,7 +11,7 @@ import com.kurtsevich.rental.api.service.IUserService;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.EditPassportDto;
+import com.kurtsevich.rental.dto.rent_terms.EditPassportDto;
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
@@ -21,6 +21,7 @@ import com.kurtsevich.rental.model.Role;
 import com.kurtsevich.rental.model.User;
 import com.kurtsevich.rental.model.UserProfile;
 import com.kurtsevich.rental.util.mapper.UserMapper;
+import com.kurtsevich.rental.util.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final PassportRepository passportRepository;
     private final UserMapper userMapper;
+    private final UserProfileMapper userProfileMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -167,16 +169,12 @@ public class UserService implements IUserService {
     @Override
     public void editUserProfile(EditUserProfileDto editUserProfileDto) {
         User user = userRepository.findByUsername(editUserProfileDto.getUsername());
-        if (editUserProfileDto.getFirstName() != null) {
-            user.getUserProfile().setFirstName(editUserProfileDto.getFirstName());
+        if(user == null){
+            throw new NotFoundEntityException(editUserProfileDto.getUsername());
+
         }
-        if (editUserProfileDto.getLastName() != null) {
-            user.getUserProfile().setLastName(editUserProfileDto.getLastName());
-        }
-        if (editUserProfileDto.getPhoneNumber() != null) {
-            user.getUserProfile().setPhoneNumber(editUserProfileDto.getPhoneNumber());
-        }
-        log.info("In UserService:editUserProfile - user {} successfully edited profile", user);
+        userProfileMapper.update(user.getUserProfile(), editUserProfileDto);
+        log.info("In UserService:editUserProfile - user profile {} edited successfully ", user);
 
     }
 
@@ -191,7 +189,7 @@ public class UserService implements IUserService {
         passport.setDateOfExpire(editPassportDto.getDateOfExpire());
 
         user.getUserProfile().setUpdated(LocalDateTime.now());
-        log.info("In UserService:editPassport - user {} successfully edited passport {}", user, passport);
+        log.info("In UserService:editPassport - user {} passport {} has been successfully edited", user, passport);
 
     }
 

@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,29 +26,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/histories")
-@Validated
 @RequiredArgsConstructor
 public class HistoryController {
     private final IHistoryService historyService;
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @PutMapping
-    public ResponseEntity<Void> createHistory(@RequestBody UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
+    public ResponseEntity<Void> createHistory(@RequestBody @Valid UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
         historyService.createHistory(userProfileScooterAndPriceDto);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @PutMapping("/finish")
-    public ResponseEntity<FinishedHistoryDto> finishedTrip(@Valid @RequestBody FinishedTripDto finishedTripDto) {
+    public ResponseEntity<FinishedHistoryDto> finishedTrip(@RequestBody @Valid FinishedTripDto finishedTripDto) {
         return ResponseEntity.ok(historyService.finishHistory(finishedTripDto));
     }
 
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/users")
     public ResponseEntity<List<HistoryDto>> findAllHistoryByUsername(@RequestParam("username") String username,
-                                                              @RequestParam("page") int page,
-                                                              @RequestParam("size") int size) {
+                                                                     @RequestParam("page") int page,
+                                                                     @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(historyService.findAllHistoryByUsername(username, pageable));
     }
@@ -64,8 +62,8 @@ public class HistoryController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/scooters/{id}")
     public ResponseEntity<List<HistoryDto>> findByScooterId(@PathVariable Long id,
-                                                              @RequestParam("page") int page,
-                                                              @RequestParam("size") int size) {
+                                                            @RequestParam("page") int page,
+                                                            @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(historyService.findByScooterId(id, pageable));
     }
@@ -74,8 +72,8 @@ public class HistoryController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     @GetMapping("/date")
     public ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("date") String date,
-                                                              @RequestParam("page") int page,
-                                                              @RequestParam("size") int size) {
+                                                                 @RequestParam("page") int page,
+                                                                 @RequestParam("size") int size) {
         Pageable pageable = PageRequest.of(page, size);
         LocalDateTime dateTime = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
         return ResponseEntity.ok(historyService.findByDate(dateTime, pageable));

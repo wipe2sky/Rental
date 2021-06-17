@@ -75,13 +75,18 @@ public class ScooterService implements IScooterService {
                 .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()))
                 .setRentTerms(rentTermsRepository.findById(scooterRentTermsDto.getRentTermsId())
                         .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getRentTermsId())));
+        log.info("IN ScooterService:addRentTermsToScooter - rent terms with id {} added to scooter with id {}",
+                scooterRentTermsDto.getId(), scooterRentTermsDto.getRentTermsId());
+
     }
 
     @Override
-    public void deleteRentTermsAtScooter(ScooterRentTermsDto scooterRentTermsDto) {
+    public void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto) {
         Scooter scooter = scooterRepository.findById(scooterRentTermsDto.getId())
                 .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()));
         scooter.setRentTerms(null);
+        log.info("IN ScooterService:deleteRentTermsAtScooter - rent terms with id {} deleted to scooter with id {}",
+                scooterRentTermsDto.getId(), scooterRentTermsDto.getRentTermsId());
     }
 
     @Override

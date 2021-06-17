@@ -6,6 +6,7 @@ import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.service.IScooterModelService;
 import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
+import com.kurtsevich.rental.dto.scooter.UpdateScooterModelDto;
 import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterModelMapper;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,7 @@ public class ScooterModelService implements IScooterModelService {
     }
 
     @Override
-    public void update(ScooterModelDto scooterModelDto) {
+    public void update(UpdateScooterModelDto scooterModelDto) {
         ScooterModel scooterModel = scooterModelRepository.findByModel(scooterModelDto.getModel());
         if (scooterModel == null) {
             throw new NotFoundEntityException(scooterModelDto.getModel());

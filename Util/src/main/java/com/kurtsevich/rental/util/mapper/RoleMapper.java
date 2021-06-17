@@ -1,6 +1,6 @@
 package com.kurtsevich.rental.util.mapper;
 
-import com.kurtsevich.rental.dto.RoleWithoutUsersDto;
+import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
 import com.kurtsevich.rental.model.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

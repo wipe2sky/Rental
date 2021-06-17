@@ -11,10 +11,10 @@ public class FinishedHistoryDto {
     private LocalDateTime created;
     private LocalDateTime finished;
     private Long distance;
-    private int travelTime;
-    private int actualDiscount;
-    private double price;
-    private double amountToPay;
+    private Integer travelTime;
+    private Integer actualDiscount;
+    private Double price;
+    private Double amountToPay;
     private ScooterWithoutHistoriesDto scooter;
     private UserProfileWithoutHistoriesDto userProfile;
 }

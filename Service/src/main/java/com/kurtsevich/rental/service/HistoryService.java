@@ -57,6 +57,8 @@ public class HistoryService implements IHistoryService {
             history.setPrice(BigDecimal.valueOf(userProfileScooterAndPriceDto.getPrice()));
         }
         historyRepository.saveAndFlush(history);
+
+        log.info("IN HistoryService:createHistory - history successfully created");
     }
 
     private void validateStatus(UserProfile userProfile, Scooter scooter) {
@@ -102,6 +104,8 @@ public class HistoryService implements IHistoryService {
 
         history.setPrice(BigDecimal.valueOf(sumWithDiscount));
 
+        log.info("IN HistoryService:finishHistory - history successfully finished");
+
         return createFinishedHistoryDto(history, finishedTripDto.getMileage(), (int)travelTime, sumWithDiscount, amountToPay);
     }
 
@@ -134,6 +138,9 @@ public class HistoryService implements IHistoryService {
         finishedHistoryDto.setTravelTime(travelTime);
         finishedHistoryDto.setPrice(sumWithDiscount);
         finishedHistoryDto.setAmountToPay(amountToPay);
+
+        log.info("IN HistoryService:createFinishedHistoryDto - FinishedHistoryDto successfully created");
+
         return finishedHistoryDto;
     }
 

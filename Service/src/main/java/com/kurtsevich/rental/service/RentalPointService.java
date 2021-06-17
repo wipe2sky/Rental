@@ -78,6 +78,8 @@ public class RentalPointService implements IRentalPointService {
         rentalPointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id))
                 .setPhoneNumber(phoneNumber);
+        log.info("IN RentalPointService:updatePhoneNumber - updated phone number {} in rental point with id {}", phoneNumber, id);
+
     }
 
     @Override
@@ -89,9 +91,10 @@ public class RentalPointService implements IRentalPointService {
             throw new ServiceException("Impossible to replace status with same");
         }else if(status.equals(Status.ACTIVE) || status.equals(Status.NOT_ACTIVE)){
             rentalPoint.setStatus(status);
+            log.info("IN RentalPointService:updateStatus - changed status from {} to {} in rental point with id {}",
+                    rentalPoint.getStatus(), status, id);
         }else {
             throw new ServiceException("Incorrect rental point status");
-
         }
     }
 
@@ -103,7 +106,7 @@ public class RentalPointService implements IRentalPointService {
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getRentalPointId()));
         scooter.setRentalPoint(rentalPoint);
         scooter.setStatus(Status.ACTIVE);
-        log.info("IN RentalPointService:addScooterToRentalPoint - add scooter {} to rental point with id {}", scooter, rentalPointScooterDto.getRentalPointId());
+        log.info("IN RentalPointService:addScooterToRentalPoint - added scooter {} to rental point with id {}", scooter, rentalPointScooterDto.getRentalPointId());
 
     }
 
@@ -120,7 +123,7 @@ public class RentalPointService implements IRentalPointService {
         }else {
             throw new ServiceException(String.format("Scooter with id %s not exist at rental point with id %s", rentalPointScooterDto.getScooterId(), rentalPointScooterDto.getRentalPointId()));
         }
-        log.info("IN RentalPointService:addScooterToRentalPoint - remove scooter {} of rental point with id {}", scooter, rentalPointScooterDto.getRentalPointId());
+        log.info("IN RentalPointService:addScooterToRentalPoint - removed scooter {} of rental point with id {}", scooter, rentalPointScooterDto.getRentalPointId());
 
     }
 

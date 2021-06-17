@@ -1,7 +1,7 @@
 package com.kurtsevich.rental.dto.user;
 
 import com.kurtsevich.rental.Status;
-import com.kurtsevich.rental.dto.PassportDto;
+import com.kurtsevich.rental.dto.rent_terms.PassportDto;
 import com.kurtsevich.rental.dto.history.HistoryWithoutUserProfileDto;
 import lombok.Data;
 
@@ -18,7 +18,7 @@ public class UserProfileDto {
     private String lastName;
     private String phoneNumber;
     private PassportDto passport;
-    private int discount;
+    private Integer discount;
     private BigDecimal prepayments;
     private List<HistoryWithoutUserProfileDto> histories;
 
