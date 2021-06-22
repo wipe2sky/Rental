@@ -1,6 +1,6 @@
 package com.kurtsevich.rental.util.mapper;
 
-import com.kurtsevich.rental.dto.rent_terms.PassportDto;
+import com.kurtsevich.rental.dto.passport.PassportDto;
 import com.kurtsevich.rental.model.Passport;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

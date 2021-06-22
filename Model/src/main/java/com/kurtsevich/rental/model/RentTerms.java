@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 @Table(name = "rent_terms")
 public class RentTerms extends BaseEntity{
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "price")
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
 }

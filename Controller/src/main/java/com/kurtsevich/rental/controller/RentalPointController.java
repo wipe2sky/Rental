@@ -10,10 +10,12 @@ import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,42 +31,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RentalPointController {
     private final IRentalPointService rentalPointService;
+    private static final String AUTHENTICATION_ROLE_ADMIN_OR_WORKER = "hasRole('ADMIN') or hasRole('WORKER')";
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     public ResponseEntity<Void> add(@RequestBody @Valid RentalPointWithoutScootersDto rentalPointWithoutScootersDto) {
         rentalPointService.add(rentalPointWithoutScootersDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/{id}")
     public ResponseEntity<RentalPointDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(rentalPointService.getById(id));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         rentalPointService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/scooters")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     public ResponseEntity<Void> addScooter(@RequestBody @Valid RentalPointScooterDto rentalPointScooterDto) {
         rentalPointService.addScooterToRentalPoint(rentalPointScooterDto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/scooters")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     public ResponseEntity<Void> removeScooter(@RequestBody @Valid RentalPointScooterDto rentalPointScooterDto) {
         rentalPointService.removeScooterFromRentalPoint(rentalPointScooterDto);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping
     public ResponseEntity<List<RentalPointDto>> getAll(@RequestParam("page") int page,
                                                        @RequestParam("size") int size) {
@@ -72,7 +75,7 @@ public class RentalPointController {
         return ResponseEntity.ok(rentalPointService.getAll(pageable));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/{id}/scooters/status")
     public ResponseEntity<List<ScooterWithoutHistoriesDto>> getScootersByStatusSortBy(@PathVariable Long id,
                                                                                       @RequestParam("page") int page,
@@ -82,7 +85,7 @@ public class RentalPointController {
         return ResponseEntity.ok(rentalPointService.getScootersInRentalPointByStatus(id, Status.valueOf(status), pageable));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/{id}/scooters/count")
     public ResponseEntity<Integer> getCountScootersByStatus(@PathVariable Long id,
                                                             @RequestParam("status") String status) {
@@ -95,14 +98,14 @@ public class RentalPointController {
         return ResponseEntity.ok(rentalPointService.getSortByDistance(longitude, latitude));
     }
 
-    @PutMapping("/{id}/phones")
+    @PatchMapping("/{id}/phones")
     public ResponseEntity<Void> changePhone(@PathVariable Long id,
                                             @RequestParam("phone") String phone) {
         rentalPointService.updatePhoneNumber(id, phone);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(@PathVariable Long id,
                                              @RequestParam("status") String status) {
         rentalPointService.updateStatus(id, Status.valueOf(status));

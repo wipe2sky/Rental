@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @Table(name = "user")
 public class User extends BaseEntity {
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)

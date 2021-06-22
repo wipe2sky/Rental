@@ -1,6 +1,5 @@
-package com.kurtsevich.rental.dto.user;
+package com.kurtsevich.rental.dto.passport;
 
-import com.kurtsevich.rental.Status;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -9,27 +8,9 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Data
-public class CreateUserDto {
+public class EditPassportDto {
     @NotBlank(message = "username must not be null")
     private String username;
-
-    @NotBlank(message = "password must not be null")
-    private String password;
-
-    @NotNull(message = "status must not be null")
-    private Status status;
-
-    @NotBlank(message = "phoneNumber must not be null")
-    @Pattern(regexp = "([0-9]{12})", message = "Use only digits, size 12")
-    private String phoneNumber;
-
-    @NotBlank(message = "firstName must not be null")
-    private String firstName;
-
-    @NotBlank(message = "lastName must not be null")
-    private String lastName;
-
-    private String role;
 
     @Pattern(regexp="([A-Z]{2}[0-9]{7})", message = "In passportNumber use only 2 uppercase english character and 9 digits")
     private String passportNumber;
@@ -40,6 +21,6 @@ public class CreateUserDto {
     @NotNull(message = "dateOfIssue must not be null")
     private LocalDate dateOfIssue;
 
-    @NotNull(message = "dateOfExpire must not be null")
+    @NotBlank(message = "dateOfExpire must not be null")
     private LocalDate dateOfExpire;
 }

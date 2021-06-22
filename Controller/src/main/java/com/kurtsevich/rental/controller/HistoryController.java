@@ -8,6 +8,7 @@ import com.kurtsevich.rental.dto.user.UserProfileScooterAndPriceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,15 +30,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HistoryController {
     private final IHistoryService historyService;
+    private static final String AUTHENTICATION_ROLE_ADMIN_OR_WORKER = "hasRole('ADMIN') or hasRole('WORKER')";
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @PutMapping
     public ResponseEntity<Void> createHistory(@RequestBody @Valid UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
         historyService.createHistory(userProfileScooterAndPriceDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @PutMapping("/finish")
     public ResponseEntity<FinishedHistoryDto> finishedTrip(@RequestBody @Valid FinishedTripDto finishedTripDto) {
         return ResponseEntity.ok(historyService.finishHistory(finishedTripDto));
@@ -59,7 +61,7 @@ public class HistoryController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/scooters/{id}")
     public ResponseEntity<List<HistoryDto>> findByScooterId(@PathVariable Long id,
                                                             @RequestParam("page") int page,
@@ -69,7 +71,7 @@ public class HistoryController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
+    @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/date")
     public ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("date") String date,
                                                                  @RequestParam("page") int page,

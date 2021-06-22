@@ -1,6 +1,9 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
+import com.kurtsevich.rental.api.exception.ServiceException;
+import com.kurtsevich.rental.dto.exception.ExceptionDto;
+import com.kurtsevich.rental.dto.exception.ValidationExceptionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,32 +23,54 @@ import java.util.List;
 @ControllerAdvice
 @Slf4j
 public class MyExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(NotFoundEntityException.class)
-    private ResponseEntity<String> handleNotFoundEntityException(NotFoundEntityException ex) {
+    private ResponseEntity<ExceptionDto> handleNotFoundEntityException(NotFoundEntityException ex) {
         log.error(Arrays.toString(ex.getStackTrace()));
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getLocalizedMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
-    private ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+    private ResponseEntity<ExceptionDto> handleAuthenticationException(AuthenticationException ex) {
         log.error(Arrays.toString(ex.getStackTrace()));
-        return new ResponseEntity<>(ex.getLocalizedMessage(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getLocalizedMessage())
+                , HttpStatus.UNAUTHORIZED);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ValidationExceptionDto exceptionDto = new ValidationExceptionDto();
+        List<String> details = new ArrayList<>();
+        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
+            details.add(error.getDefaultMessage());
+        }
+        exceptionDto.setException(ex.getClass().getSimpleName());
+        exceptionDto.setMessages(details);
+        log.error(details.toString());
+        return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    private ResponseEntity<ExceptionDto> handleServiceException(ServiceException ex) {
+        log.error(Arrays.toString(ex.getStackTrace()));
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getLocalizedMessage())
+                , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
     @ExceptionHandler(Exception.class)
-    private ResponseEntity<String> handleUnexpectedException(Exception ex) {
+    private ResponseEntity<ExceptionDto> handleUnexpectedException(Exception ex) {
         log.error(Arrays.toString(ex.getStackTrace()));
-        return new ResponseEntity<>(ex.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        List<String> details = new ArrayList<>();
-        for(ObjectError error : ex.getBindingResult().getAllErrors()) {
-            details.add(error.getDefaultMessage());
-        }
-        log.error(details.toString());
-        return new ResponseEntity<>("Validation exception: " + details, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getLocalizedMessage())
+                , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

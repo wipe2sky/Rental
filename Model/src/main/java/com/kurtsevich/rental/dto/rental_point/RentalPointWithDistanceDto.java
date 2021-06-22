@@ -11,6 +11,9 @@ import javax.validation.constraints.Pattern;
 
 @Data
 public class RentalPointWithDistanceDto {
+    @NotNull(message = "id must not be null")
+    private Long id;
+
     @NotBlank(message = "name must not be null")
     private String name;
 

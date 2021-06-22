@@ -8,11 +8,12 @@ import com.kurtsevich.rental.api.repository.RoleRepository;
 import com.kurtsevich.rental.api.repository.UserProfileRepository;
 import com.kurtsevich.rental.api.repository.UserRepository;
 import com.kurtsevich.rental.api.service.IUserService;
+import com.kurtsevich.rental.dto.passport.EditPassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.rent_terms.EditPassportDto;
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.SetDiscountDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
 import com.kurtsevich.rental.dto.user.UserStatusDto;
@@ -52,7 +53,6 @@ public class UserService implements IUserService {
     @Override
     public void register(CreateUserDto createUserDto) {
         User user = userMapper.createdUserDtoToUser(createUserDto);
-        UserProfile userProfile = userMapper.createdUserDtoToUserProfile(createUserDto);
         user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         userRepository.saveAndFlush(user);
 
@@ -61,6 +61,7 @@ public class UserService implements IUserService {
         Passport passport = userMapper.createdUserDtoToPassport(createUserDto);
         passportRepository.saveAndFlush(passport);
 
+        UserProfile userProfile = userMapper.createdUserDtoToUserProfile(createUserDto);
         userProfile.setUser(user);
         userProfile.setPassport(passport);
         userProfile.setDiscount(0);
@@ -77,6 +78,7 @@ public class UserService implements IUserService {
                 .collect(Collectors.toList());
 
         if (userDtoList.isEmpty()) {
+            log.warn("IN UserService:getAll - Request page number greater than available");
             throw new ServiceException("Request page number greater than available");
         }
         return userDtoList;
@@ -112,10 +114,15 @@ public class UserService implements IUserService {
 
     @Override
     public void changeUserStatus(UserStatusDto userStatusDto) {
-        userRepository.findById(userStatusDto.getUserId())
-                .orElseThrow(() -> new NotFoundEntityException(userStatusDto.getUserId()))
-                .getUserProfile()
-                .setStatus(userStatusDto.getStatus());
+        User user = userRepository.findById(userStatusDto.getUserId())
+                .orElseThrow(() -> new NotFoundEntityException(userStatusDto.getUserId()));
+
+        if (user.getUserProfile().getStatus().equals(userStatusDto.getStatus())) {
+            log.warn("In UserService:changeUserStatus - can't change status {} on the same", userStatusDto.getStatus());
+            throw new ServiceException("Can't change status " + userStatusDto.getStatus() + " on the same");
+        }
+
+        user.getUserProfile().setStatus(userStatusDto.getStatus());
         log.info("In UserService:changeUserStatus - successfully set status {} to user with id {}  }", userStatusDto.getStatus(), userStatusDto.getUserId());
 
     }
@@ -127,6 +134,11 @@ public class UserService implements IUserService {
         Role role = roleRepository.findById(userRoleDto.getRoleId())
                 .orElseThrow(() -> new NotFoundEntityException(userRoleDto.getRoleId()));
 
+        if (!user.getRoles().contains(role)) {
+            log.warn("In UserService:deleteUserRole - Role with id {} not found at user with id {}", role.getId(), user.getId());
+            throw new ServiceException("Role with id " + role.getId() + " not found at user with id " + user.getId());
+        }
+
         user.getRoles().remove(role);
         log.info("In UserService:deleteUserRole - role {} successfully deleted to user {}", role, user);
 
@@ -134,18 +146,20 @@ public class UserService implements IUserService {
 
     @Override
     public void changeUserPassword(ChangeUserPasswordDto changeUserPasswordDto) {
-        User user = userRepository.findByUsername(changeUserPasswordDto.getUsername());
-        if (user == null) {
-            throw new NotFoundEntityException(changeUserPasswordDto.getUsername());
-        }
+        User user = validationUserIsNotNullAndIsActive(changeUserPasswordDto.getUsername(), "changeUserPassword");
+
         if (changeUserPasswordDto.getOldPassword().equals(changeUserPasswordDto.getNewPassword())) {
+            log.warn("In UserService:changeUserPassword - The new password can't be equals the old password!");
             throw new AuthenticationServiceException("The new password can't be equals the old password!");
         }
 
         if (passwordEncoder.matches(changeUserPasswordDto.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(changeUserPasswordDto.getNewPassword()));
             user.getUserProfile().setUpdated(LocalDateTime.now());
-        } else throw new AuthenticationServiceException("Incorrect password!");
+        } else {
+            log.warn("In UserService:changeUserPassword - incorrect password!");
+            throw new AuthenticationServiceException("Incorrect password!");
+        }
         log.info("In UserService:changeUserPassword - user {} successfully changed password", user);
 
     }
@@ -159,20 +173,18 @@ public class UserService implements IUserService {
     @Override
     public UserDto findProfileByUsername(String username) {
         User user = userRepository.findByUsername(username);
-        if(user != null) {
+        if (user != null) {
             return userMapper.userToUserDto(user);
         } else {
+            log.warn("In UserService:findProfileByUsername - username {} not found", username);
             throw new ServiceException("Can't find user with username " + username);
         }
     }
 
     @Override
     public void editUserProfile(EditUserProfileDto editUserProfileDto) {
-        User user = userRepository.findByUsername(editUserProfileDto.getUsername());
-        if(user == null){
-            throw new NotFoundEntityException(editUserProfileDto.getUsername());
+        User user = validationUserIsNotNullAndIsActive(editUserProfileDto.getUsername(), "editUserProfile");
 
-        }
         userProfileMapper.update(user.getUserProfile(), editUserProfileDto);
         log.info("In UserService:editUserProfile - user profile {} edited successfully ", user);
 
@@ -180,28 +192,55 @@ public class UserService implements IUserService {
 
     @Override
     public void editPassport(EditPassportDto editPassportDto) {
-        User user = userRepository.findByUsername(editPassportDto.getUsername());
+        User user = validationUserIsNotNullAndIsActive(editPassportDto.getUsername(), "editPassport");
 
         Passport passport = user.getUserProfile().getPassport();
+        if (passport == null) {
+            log.warn("In UserService:editPassport - user with username {} not have a passport", user.getUsername());
+            throw new NotFoundEntityException(user.getUsername());
+        }
         passport.setPassportNumber(editPassportDto.getPassportNumber());
         passport.setIdentificationNumber(editPassportDto.getIdentificationNumber());
         passport.setDateOfIssue(editPassportDto.getDateOfIssue());
         passport.setDateOfExpire(editPassportDto.getDateOfExpire());
 
-        user.getUserProfile().setUpdated(LocalDateTime.now());
         log.info("In UserService:editPassport - user {} passport {} has been successfully edited", user, passport);
 
     }
 
     @Override
     public Long addPrepayments(AddPrepaymentsDto addPrepaymentsDto) {
-        UserProfile userProfile = userRepository.findByUsername(addPrepaymentsDto.getUsername()).getUserProfile();
+        User user = validationUserIsNotNullAndIsActive(addPrepaymentsDto.getUsername(), "addPrepayments");
+        UserProfile userProfile = user.getUserProfile();
+
         BigDecimal pay = BigDecimal.valueOf(addPrepaymentsDto.getPrepayments() * 2);
         BigDecimal prepayments = userProfile.getPrepayments().add(pay);
         userProfile.setPrepayments(prepayments);
 
         log.info("IN UserService:addPrepayments - add prepayments {} to user {}", pay, addPrepaymentsDto.getUsername());
         return prepayments.longValue();
+    }
+
+    private User validationUserIsNotNullAndIsActive(String username, String method) {
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            log.warn("IN UserService:{} - user with username {} not found", method, username);
+            throw new NotFoundEntityException(username);
+        }
+        if (!Status.ACTIVE.equals(user.getUserProfile().getStatus())) {
+            log.warn("IN UserService:{} - user with username {} not active", method, username);
+            throw new ServiceException("User with username: " + username + " not active");
+        }
+        return user;
+    }
+
+    @Override
+    public void setDiscount(SetDiscountDto setDiscountDto) {
+        User user = userRepository.findById(setDiscountDto.getUserId())
+                .orElseThrow(() -> new NotFoundEntityException(setDiscountDto.getUserId()));
+        user.getUserProfile().setDiscount(setDiscountDto.getDiscount());
+        log.info("IN UserService:setDiscount - set discount = {} to user with id {}",setDiscountDto.getDiscount(), setDiscountDto.getUserId());
     }
 }
 

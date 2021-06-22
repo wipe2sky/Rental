@@ -7,6 +7,7 @@ import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +32,7 @@ public class ScooterController {
     @PutMapping
     public ResponseEntity<Void> add(@RequestBody @Valid AddScooterDto addScooterDto) {
         scooterService.add(addScooterDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping

@@ -37,6 +37,11 @@ public class ScooterService implements IScooterService {
         Scooter scooter = scooterMapper.addScooterDtoToScooter(addScooterDto);
         ScooterModel scooterModel = scooterModelRepository.findByModel(addScooterDto.getScooterModelName());
 
+        if (scooterModel == null){
+            log.error("Couldn't find scooter model by name {}", addScooterDto.getScooterModelName());
+            throw new ServiceException("Couldn't find scooter model by name " + addScooterDto.getScooterModelName());
+        }
+
         if (scooterModel.getStatus().equals(Status.ACTIVE)) {
             scooter.setScooterModel(scooterModel);
             scooterRepository.saveAndFlush(scooter);
@@ -49,9 +54,14 @@ public class ScooterService implements IScooterService {
 
     @Override
     public List<ScooterDto> getAll(Pageable page) {
-        return scooterRepository.findAll(page).stream()
+        List<ScooterDto> scooterDtoList = scooterRepository.findAll(page).stream()
                 .map(scooterMapper::scooterToScooterDto)
                 .collect(Collectors.toList());
+        if (scooterDtoList.isEmpty()) {
+            log.warn("IN ScooterService:getAll - Request page number greater than available");
+            throw new ServiceException("Request page number greater than available");
+        }
+        return scooterDtoList;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.kurtsevich.rental.service;
 
-import com.kurtsevich.rental.api.exception.NotFoundEntityException;
 import com.kurtsevich.rental.api.repository.RoleRepository;
 import com.kurtsevich.rental.api.service.IRoleService;
 import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
@@ -27,10 +26,4 @@ public class RoleService implements IRoleService {
         log.info("IN RoleService:add - role {} created", role);
     }
 
-    @Override
-    public void delete(Long id) {
-        roleRepository.delete(roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(id)));
-        log.info("IN RoleService:delete - role with id {} deleted", id);
-    }
 }

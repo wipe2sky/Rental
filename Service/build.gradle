@@ -11,10 +11,9 @@ repositories {
 
 dependencies {
     implementation(project(':API'))
-    implementation(project(':Security'))
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.9.0'
+    compile(project(':Security'))
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
 test {

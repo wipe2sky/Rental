@@ -87,13 +87,16 @@ public class RentalPointService implements IRentalPointService {
 
         RentalPoint rentalPoint = rentalPointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id));
+
         if(status.equals(rentalPoint.getStatus())){
+            log.warn("IN RentalPointService:updateStatus - Impossible to replace status with same");
             throw new ServiceException("Impossible to replace status with same");
         }else if(status.equals(Status.ACTIVE) || status.equals(Status.NOT_ACTIVE)){
             rentalPoint.setStatus(status);
             log.info("IN RentalPointService:updateStatus - changed status from {} to {} in rental point with id {}",
                     rentalPoint.getStatus(), status, id);
         }else {
+            log.warn("IN RentalPointService:updateStatus - status: {} incorrect", rentalPoint.getStatus());
             throw new ServiceException("Incorrect rental point status");
         }
     }
@@ -102,6 +105,11 @@ public class RentalPointService implements IRentalPointService {
     public void addScooterToRentalPoint(RentalPointScooterDto rentalPointScooterDto) {
         Scooter scooter = scooterRepository.findById(rentalPointScooterDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getScooterId()));
+        if (Status.BOOKED.equals(scooter.getStatus())){
+            log.warn("IN RentalPointService:addScooterToRentalPoint - Can't add scooter. Scooter with id {} is booked now", scooter.getId());
+            throw new ServiceException("Can't add scooter with id" + scooter.getId() +  ". It BOOKED now");
+        }
+
         RentalPoint rentalPoint = rentalPointRepository.findById(rentalPointScooterDto.getRentalPointId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getRentalPointId()));
         scooter.setRentalPoint(rentalPoint);

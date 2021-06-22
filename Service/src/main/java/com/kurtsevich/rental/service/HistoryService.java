@@ -46,14 +46,19 @@ public class HistoryService implements IHistoryService {
         Scooter scooter = scooterRepository.findById(userProfileScooterAndPriceDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getScooterId()));
 
-        validateStatus(userProfile, scooter);
+        validateUserProfileAndScooterAndRentalPointIsActive(userProfile, scooter, "createHistory");
+
+        if (scooter.getRentTerms() == null) {
+            log.warn("IN HistoryService:createHistory - scooter with id {} not have a role", scooter.getId());
+            throw new ServiceException("User is not active");
+        }
 
         scooter.setStatus(Status.BOOKED);
         History history = new History();
         history.setActual(true);
         history.setUserProfile(userProfile);
         history.setScooter(scooter);
-        if(userProfileScooterAndPriceDto.getPrice() != null) {
+        if (userProfileScooterAndPriceDto.getPrice() != null) {
             history.setPrice(BigDecimal.valueOf(userProfileScooterAndPriceDto.getPrice()));
         }
         historyRepository.saveAndFlush(history);
@@ -61,14 +66,17 @@ public class HistoryService implements IHistoryService {
         log.info("IN HistoryService:createHistory - history successfully created");
     }
 
-    private void validateStatus(UserProfile userProfile, Scooter scooter) {
-        if(!Status.ACTIVE.equals(userProfile.getStatus())){
+    private void validateUserProfileAndScooterAndRentalPointIsActive(UserProfile userProfile, Scooter scooter, String method) {
+        if (!Status.ACTIVE.equals(userProfile.getStatus())) {
+            log.warn("IN HistoryService:{} - user: {} not active", method, userProfile.getUser().getUsername());
             throw new ServiceException("User is not active");
         }
         if (!Status.ACTIVE.equals(scooter.getStatus())) {
+            log.warn("IN HistoryService:{} - scooter with id {} is not active", method, scooter.getId());
             throw new ServiceException("Scooter is not active");
         }
-        if (!Status.ACTIVE.equals( scooter.getRentalPoint().getStatus())){
+        if (!Status.ACTIVE.equals(scooter.getRentalPoint().getStatus())) {
+            log.warn("IN HistoryService:{} - rental points with id {} is not active", method, scooter.getRentalPoint().getId());
             throw new ServiceException("Rental Point is " + scooter.getRentalPoint().getStatus());
         }
     }
@@ -85,9 +93,14 @@ public class HistoryService implements IHistoryService {
 
         Scooter scooter = history.getScooter();
 
+        int discount =  finishedTripDto.getDiscount() != 0
+                && finishedTripDto.getDiscount() > userProfile.getDiscount()
+                ? finishedTripDto.getDiscount()
+                : userProfile.getDiscount();
+
         history.setFinished(LocalDateTime.now());
         history.setDistance(finishedTripDto.getMileage());
-        history.setActualDiscount(userProfile.getDiscount());
+        history.setActualDiscount(discount);
         history.setActual(false);
 
         scooter.setStatus(Status.ACTIVE);
@@ -96,7 +109,7 @@ public class HistoryService implements IHistoryService {
 
         double travelTime = getTravelTimeInHour(history);
 
-        double sumWithDiscount = getSumWithDiscount(userProfile.getDiscount(),
+        double sumWithDiscount = getSumWithDiscount(discount,
                 history.getPrice(), scooter.getRentTerms().getPrice(), travelTime);
 
         double prepayments = userProfile.getPrepayments().doubleValue();
@@ -116,7 +129,7 @@ public class HistoryService implements IHistoryService {
             return 0;
         } else {
             userProfile.setPrepayments(new BigDecimal(0));
-           return sumWithDiscount - prepayments;
+            return sumWithDiscount - prepayments;
         }
     }
 
@@ -125,14 +138,16 @@ public class HistoryService implements IHistoryService {
                 ? scooterPrice.doubleValue() * travelTime * (100 - discount) / 100
                 : historyPrice.doubleValue();
     }
+
     private double getTravelTimeInHour(History history) {
-        return Math.ceil((double) (history.getFinished().toLocalTime().toSecondOfDay()
+        double travelTime = Math.ceil((double) (history.getFinished().toLocalTime().toSecondOfDay()
                 - history.getCreated().toLocalTime().toSecondOfDay()
                 - CORRECTION_TIME_IN_SECONDS)
                 / 3600);
+        return travelTime > 0 ? travelTime : 0;
     }
 
-    private FinishedHistoryDto createFinishedHistoryDto(History history, Long mileage, int travelTime, double sumWithDiscount, double amountToPay){
+    private FinishedHistoryDto createFinishedHistoryDto(History history, Long mileage, int travelTime, double sumWithDiscount, double amountToPay) {
         FinishedHistoryDto finishedHistoryDto = historyMapper.historyToHFinishedHistoryDto(history);
         finishedHistoryDto.setDistance(mileage);
         finishedHistoryDto.setTravelTime(travelTime);
