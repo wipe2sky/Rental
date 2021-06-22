@@ -6,7 +6,6 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,24 +23,24 @@ import java.util.List;
 @Table(name = "scooter")
 public class Scooter extends BaseEntity {
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private Status status;
 
-    @Column(name = "charge")
+    @Column(name = "charge", nullable = false)
     private int charge;
 
-    @Column(name = "mileage")
+    @Column(name = "mileage", nullable = false)
     private Long mileage;
 
     @CreationTimestamp
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
     @UpdateTimestamp
-    @Column(name = "updated")
+    @Column(name = "updated", nullable = false)
     private LocalDateTime updated;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scooter_model", nullable = false)
     private ScooterModel scooterModel;
 

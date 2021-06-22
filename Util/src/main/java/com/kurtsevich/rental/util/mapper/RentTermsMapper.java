@@ -1,7 +1,7 @@
 package com.kurtsevich.rental.util.mapper;
 
-import com.kurtsevich.rental.dto.passport.RentTermsDto;
-import com.kurtsevich.rental.dto.passport.UpdateRentTermsDto;
+import com.kurtsevich.rental.dto.rent_terms.RentTermsDto;
+import com.kurtsevich.rental.dto.rent_terms.UpdateRentTermsDto;
 import com.kurtsevich.rental.model.RentTerms;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +17,6 @@ public interface RentTermsMapper {
 
     RentTermsDto rentTermsToRentTermsDto(RentTerms rentTerms);
 
-    @Mapping(target = "rentTerms.id", source = "rentTermsDto.id", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "rentTerms.name", source = "rentTermsDto.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "rentTerms.price", source = "rentTermsDto.price", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(@MappingTarget RentTerms rentTerms, UpdateRentTermsDto rentTermsDto);

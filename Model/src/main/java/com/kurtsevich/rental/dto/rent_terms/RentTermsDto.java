@@ -1,4 +1,4 @@
-package com.kurtsevich.rental.dto.passport;
+package com.kurtsevich.rental.dto.rent_terms;
 
 import lombok.Data;
 

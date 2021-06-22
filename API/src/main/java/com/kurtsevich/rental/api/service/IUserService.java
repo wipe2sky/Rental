@@ -1,10 +1,11 @@
 package com.kurtsevich.rental.api.service;
 
-import com.kurtsevich.rental.dto.rent_terms.EditPassportDto;
+import com.kurtsevich.rental.dto.passport.EditPassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.SetDiscountDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
 import com.kurtsevich.rental.dto.user.UserStatusDto;
@@ -39,4 +40,6 @@ public interface IUserService {
     void editPassport(EditPassportDto editPassportDto);
 
     Long addPrepayments(AddPrepaymentsDto addPrepaymentsDto);
+
+    void setDiscount(SetDiscountDto setDiscountDto);
 }

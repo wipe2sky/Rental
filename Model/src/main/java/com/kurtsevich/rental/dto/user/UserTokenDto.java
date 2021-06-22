@@ -2,12 +2,13 @@ package com.kurtsevich.rental.dto.user;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Data
 public class UserTokenDto {
-    @NotNull
+    @NotBlank(message = "username must not be null")
     private String username;
-    @NotNull
+
+    @NotBlank(message = "token must not be null")
     private String token;
 }

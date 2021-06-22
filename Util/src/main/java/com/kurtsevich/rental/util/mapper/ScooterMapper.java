@@ -1,7 +1,6 @@
 package com.kurtsevich.rental.util.mapper;
 
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.CreateScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutRentalPointDto;
@@ -24,7 +23,4 @@ public interface ScooterMapper {
 
     ScooterWithoutRentalPointDto scooterToScooterWithoutRentalPointDto(Scooter scooter);
     Scooter scooterWithoutRentalPointDtoToScooter(ScooterWithoutRentalPointDto scooterWithoutRentalPointDto);
-
-    CreateScooterDto scooterToCreateScooterDto(Scooter scooter);
-    Scooter createScooterDtoToScooter(CreateScooterDto createScooterDto);
 }

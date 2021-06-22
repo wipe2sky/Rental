@@ -1,16 +1,18 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IUserService;
-import com.kurtsevich.rental.dto.rent_terms.EditPassportDto;
+import com.kurtsevich.rental.dto.passport.EditPassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
 import com.kurtsevich.rental.dto.user.EditUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,19 +36,19 @@ public class UserProfileController {
     @PutMapping("/reg")
     public ResponseEntity<Void> registration(@RequestBody @Valid CreateUserDto createUserDto) {
         userService.register(createUserDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PatchMapping("/password")
     @PreAuthorize("#changeUserPasswordDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
         userService.changeUserPassword(changeUserPasswordDto);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/profiles")
+    @PatchMapping("/profiles")
     @PreAuthorize("#editUserProfileDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> editUserProfile(@RequestBody @Valid  EditUserProfileDto editUserProfileDto) {
+    public ResponseEntity<Void> editUserProfile(@RequestBody @Valid EditUserProfileDto editUserProfileDto) {
         userService.editUserProfile(editUserProfileDto);
         return ResponseEntity.noContent().build();
     }

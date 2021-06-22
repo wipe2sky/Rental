@@ -8,8 +8,8 @@ import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.repository.ScooterRepository;
 import com.kurtsevich.rental.api.service.IScooterService;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.ScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
+import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.model.Scooter;
 import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterMapper;
@@ -37,6 +37,11 @@ public class ScooterService implements IScooterService {
         Scooter scooter = scooterMapper.addScooterDtoToScooter(addScooterDto);
         ScooterModel scooterModel = scooterModelRepository.findByModel(addScooterDto.getScooterModelName());
 
+        if (scooterModel == null) {
+            log.error("Couldn't find scooter model by name {}", addScooterDto.getScooterModelName());
+            throw new ServiceException("Couldn't find scooter model by name " + addScooterDto.getScooterModelName());
+        }
+
         if (scooterModel.getStatus().equals(Status.ACTIVE)) {
             scooter.setScooterModel(scooterModel);
             scooterRepository.saveAndFlush(scooter);
@@ -48,15 +53,20 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterDto> getAll(Pageable page) {
-        return scooterRepository.findAll(page).stream()
-                .map(scooterMapper::scooterToScooterDto)
+    public List<ScooterWithoutHistoriesDto> getAll(Pageable page) {
+        List<ScooterWithoutHistoriesDto> scooterDtoList = scooterRepository.findAll(page).stream()
+                .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
+        if (scooterDtoList.isEmpty()) {
+            log.warn("IN ScooterService:getAll - Request page number greater than available");
+            throw new ServiceException("Request page number greater than available");
+        }
+        return scooterDtoList;
     }
 
     @Override
-    public ScooterDto getById(Long id) {
-        return scooterMapper.scooterToScooterDto(scooterRepository.findById(id)
+    public ScooterWithoutHistoriesDto getById(Long id) {
+        return scooterMapper.scooterToScooterWithoutHistoriesDto(scooterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id)));
     }
 
@@ -90,9 +100,9 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterDto> findAllScootersByModelId(Long scooterModelId, Pageable page) {
+    public List<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, Pageable page) {
         return scooterRepository.findAllByScooterModelId(scooterModelId, page).stream()
-                .map(scooterMapper::scooterToScooterDto)
+                .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
     }
 

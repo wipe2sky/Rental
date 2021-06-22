@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "history")
 public class History extends BaseEntity {
     @CreationTimestamp
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
     @Column(name = "finished")
@@ -32,14 +32,14 @@ public class History extends BaseEntity {
     @Column(name = "actual_discount")
     private int actualDiscount;
 
-    @Column(name = "is_actual")
+    @Column(name = "is_actual", nullable = false)
     private boolean isActual;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scooter")
+    @JoinColumn(name = "scooter", nullable = false)
     private Scooter scooter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_profile")
+    @JoinColumn(name = "user_profile", nullable = false)
     private UserProfile userProfile;
 }

@@ -6,7 +6,6 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,33 +24,33 @@ import java.util.List;
 @Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private Status status;
 
     @CreationTimestamp
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
     @UpdateTimestamp
-    @Column(name = "updated")
+    @Column(name = "updated", nullable = false)
     private LocalDateTime updated;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(name = "discount")
-    private int discount;
+    private Integer discount;
 
     @Column(name = "prepayments")
     private BigDecimal prepayments;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "passport")
     private Passport passport;
 

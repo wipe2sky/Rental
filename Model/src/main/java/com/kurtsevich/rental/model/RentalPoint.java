@@ -16,37 +16,38 @@ import java.util.List;
 @Data
 @Table(name = "rental_point")
 public class RentalPoint extends BaseEntity {
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private Status status;
 
-    @Column(name = "city")
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "street_name")
+    @Column(name = "street_name", nullable = false)
     private String streetName;
 
-    @Column(name = "street_type")
+    @Column(name = "street_type", nullable = false)
     private String streetType;
 
-    @Column(name = "street_number")
+    @Column(name = "street_number", nullable = false)
     private int streetAddressNumber;
 
     @Column(name = "street_number_suffix")
     private char streetAddressNumberSuffix;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", nullable = false)
     private double longitude;
-    @Column(name = "latitude")
-    private double latitude;
 
+    @Column(name = "latitude", nullable = false)
+    private double latitude;
 
     @OneToMany(mappedBy = "rentalPoint", fetch = FetchType.LAZY)
     private List<Scooter> scooters;
+
 }

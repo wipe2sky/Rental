@@ -1,12 +1,13 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IRentTermsService;
-import com.kurtsevich.rental.dto.passport.RentTermsDto;
-import com.kurtsevich.rental.dto.passport.UpdateRentTermsDto;
+import com.kurtsevich.rental.dto.rent_terms.RentTermsDto;
+import com.kurtsevich.rental.dto.rent_terms.UpdateRentTermsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +32,7 @@ public class RentTermsController {
     @PutMapping
     public ResponseEntity<Void> add(@RequestBody @Valid RentTermsDto rentTermsDto) {
         rentTermsService.add(rentTermsDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
