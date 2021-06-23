@@ -6,8 +6,6 @@ import com.kurtsevich.rental.dto.history.FinishedTripDto;
 import com.kurtsevich.rental.dto.history.HistoryDto;
 import com.kurtsevich.rental.dto.user.UserProfileScooterAndPriceDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,17 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
 @RequestMapping("/histories")
 @RequiredArgsConstructor
 public class HistoryController {
-    private final IHistoryService historyService;
     private static final String AUTHENTICATION_ROLE_ADMIN_OR_WORKER = "hasRole('ADMIN') or hasRole('WORKER')";
+    private final IHistoryService historyService;
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @PutMapping
@@ -50,8 +45,7 @@ public class HistoryController {
     public ResponseEntity<List<HistoryDto>> findAllHistoryByUsername(@RequestParam("username") String username,
                                                                      @RequestParam("page") int page,
                                                                      @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(historyService.findAllHistoryByUsername(username, pageable));
+        return ResponseEntity.ok(historyService.findAllHistoryByUsername(username, page, size));
     }
 
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
@@ -66,18 +60,16 @@ public class HistoryController {
     public ResponseEntity<List<HistoryDto>> findByScooterId(@PathVariable Long id,
                                                             @RequestParam("page") int page,
                                                             @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(historyService.findByScooterId(id, pageable));
+        return ResponseEntity.ok(historyService.findByScooterId(id, page, size));
     }
 
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
-    @GetMapping("/date")
-    public ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("date") String date,
+    @GetMapping("/dates")
+    public ResponseEntity<List<HistoryDto>> findAllHistoryByDate(@RequestParam("start") String startDate,
+                                                                 @RequestParam("end") String endDate,
                                                                  @RequestParam("page") int page,
                                                                  @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        LocalDateTime dateTime = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
-        return ResponseEntity.ok(historyService.findByDate(dateTime, pageable));
+        return ResponseEntity.ok(historyService.findByDate(page, size, startDate, endDate));
     }
 }

@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class RoleWithoutUsersDto {
-    @NotNull(message = "id must not be null")
     private Long id;
 
     @NotBlank(message = "name must not be null")

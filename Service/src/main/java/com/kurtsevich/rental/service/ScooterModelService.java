@@ -11,7 +11,7 @@ import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -34,8 +34,8 @@ public class ScooterModelService implements IScooterModelService {
     }
 
     @Override
-    public List<ScooterModelDto> getAll(Pageable page) {
-        List<ScooterModelDto> result = scooterModelRepository.findAll(page).stream()
+    public List<ScooterModelDto> getAll(int page, int size) {
+        List<ScooterModelDto> result = scooterModelRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(mapper::scooterModelToScooterModelDto)
                 .collect(Collectors.toList());
         if (result.isEmpty()) {

@@ -8,8 +8,6 @@ import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithoutScootersDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,8 +28,8 @@ import java.util.List;
 @RequestMapping("/rent-points")
 @RequiredArgsConstructor
 public class RentalPointController {
-    private final IRentalPointService rentalPointService;
     private static final String AUTHENTICATION_ROLE_ADMIN_OR_WORKER = "hasRole('ADMIN') or hasRole('WORKER')";
+    private final IRentalPointService rentalPointService;
 
     @PutMapping
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
@@ -71,22 +69,20 @@ public class RentalPointController {
     @GetMapping
     public ResponseEntity<List<RentalPointDto>> getAll(@RequestParam("page") int page,
                                                        @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(rentalPointService.getAll(pageable));
+        return ResponseEntity.ok(rentalPointService.getAll(page, size));
     }
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
-    @GetMapping("/{id}/scooters/status")
+    @GetMapping("/{id}/scooters")
     public ResponseEntity<List<ScooterWithoutHistoriesDto>> getScootersByStatusSortBy(@PathVariable Long id,
                                                                                       @RequestParam("page") int page,
                                                                                       @RequestParam("size") int size,
                                                                                       @RequestParam("status") String status) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(rentalPointService.getScootersInRentalPointByStatus(id, Status.valueOf(status), pageable));
+        return ResponseEntity.ok(rentalPointService.getScootersInRentalPointByStatus(id, Status.valueOf(status), page, size));
     }
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
-    @GetMapping("/{id}/scooters/count")
+    @GetMapping("/{id}/scooters/counts")
     public ResponseEntity<Integer> getCountScootersByStatus(@PathVariable Long id,
                                                             @RequestParam("status") String status) {
         return ResponseEntity.ok(rentalPointService.getCountScootersInRentalPointByStatus(id, Status.valueOf(status)));

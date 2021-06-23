@@ -15,7 +15,7 @@ import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -53,8 +53,8 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> getAll(Pageable page) {
-        List<ScooterWithoutHistoriesDto> scooterDtoList = scooterRepository.findAll(page).stream()
+    public List<ScooterWithoutHistoriesDto> getAll(int page, int size) {
+        List<ScooterWithoutHistoriesDto> scooterDtoList = scooterRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
         if (scooterDtoList.isEmpty()) {
@@ -100,8 +100,8 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, Pageable page) {
-        return scooterRepository.findAllByScooterModelId(scooterModelId, page).stream()
+    public List<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size) {
+        return scooterRepository.findAllByScooterModelId(scooterModelId, PageRequest.of(page, size)).stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
     }

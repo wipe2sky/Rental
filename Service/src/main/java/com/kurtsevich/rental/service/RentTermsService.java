@@ -9,7 +9,8 @@ import com.kurtsevich.rental.model.RentTerms;
 import com.kurtsevich.rental.util.mapper.RentTermsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -57,15 +58,15 @@ public class RentTermsService implements IRentTermsService {
     }
 
     @Override
-    public List<RentTermsDto> getAll(Pageable page) {
-        return rentTermsRepository.findAll(page).stream()
+    public List<RentTermsDto> getAll(int page, int size) {
+        return rentTermsRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(rentTermsMapper::rentTermsToRentTermsDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<RentTermsDto> getSortBy(Pageable page) {
-        return rentTermsRepository.findAll(page).stream()
+    public List<RentTermsDto> getSortBy(int page, int size, String sortVar) {
+        return rentTermsRepository.findAll(PageRequest.of(page, size, Sort.by(sortVar))).stream()
                 .map(rentTermsMapper::rentTermsToRentTermsDto)
                 .collect(Collectors.toList());
     }

@@ -4,9 +4,6 @@ import com.kurtsevich.rental.api.service.IRentTermsService;
 import com.kurtsevich.rental.dto.rent_terms.RentTermsDto;
 import com.kurtsevich.rental.dto.rent_terms.UpdateRentTermsDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,16 +51,14 @@ public class RentTermsController {
 
     @GetMapping
     public ResponseEntity<List<RentTermsDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(rentTermsService.getAll(pageable));
+        return ResponseEntity.ok(rentTermsService.getAll(page, size));
     }
 
-    @GetMapping("/sort")
+    @GetMapping("/sorts")
     public ResponseEntity<List<RentTermsDto>> getAllSortBy(@RequestParam("page") int page,
                                                            @RequestParam("size") int size,
                                                            @RequestParam("sort") String sortVariable) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortVariable));
-        return ResponseEntity.ok(rentTermsService.getSortBy(pageable));
+        return ResponseEntity.ok(rentTermsService.getSortBy(page, size, sortVariable));
     }
 
 }

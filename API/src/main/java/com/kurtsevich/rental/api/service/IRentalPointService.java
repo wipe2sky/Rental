@@ -6,7 +6,6 @@ import com.kurtsevich.rental.dto.rental_point.RentalPointScooterDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithoutScootersDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface IRentalPointService {
 
     RentalPointDto getById(Long id);
 
-    List<RentalPointDto> getAll(Pageable page);
+    List<RentalPointDto> getAll(int page, int size);
 
     void delete(Long id);
 
@@ -27,7 +26,7 @@ public interface IRentalPointService {
 
     void removeScooterFromRentalPoint(RentalPointScooterDto rentalPointScooterDto);
 
-    List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, Pageable page);
+    List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, int page, int size);
 
     int getCountScootersInRentalPointByStatus(Long id, Status status);
 

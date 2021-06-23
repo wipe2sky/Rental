@@ -14,19 +14,28 @@ import java.time.LocalDateTime;
 public class UserProfileWithoutHistoriesDto {
     @NotNull(message = "status must not be null")
     private Status status;
+
     @NotNull(message = "created must not be null")
     private LocalDateTime created;
+
     @NotNull(message = "updated must not be null")
     private LocalDateTime updated;
+
     @NotBlank(message = "firstName must not be null")
     private String firstName;
+
     @NotBlank(message = "lastName must not be null")
     private String lastName;
+
+    @NotBlank(message = "phoneNumber must not be null")
     @Pattern(regexp="([0-9]{12})", message = "Use only digits, size 12")
     private String phoneNumber;
+
     private PassportDto passport;
+
     @NotNull(message = "discount must not be null")
     private Integer discount;
+
     @NotNull(message = "prepayments must not be null")
     private BigDecimal prepayments;
 }

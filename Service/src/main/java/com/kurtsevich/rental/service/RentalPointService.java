@@ -18,7 +18,7 @@ import com.kurtsevich.rental.util.mapper.RentalPointMapper;
 import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -53,9 +53,9 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
-    public List<RentalPointDto> getAll(Pageable page) {
+    public List<RentalPointDto> getAll(int page, int size) {
 
-        return rentalPointRepository.findAll(page).stream()
+        return rentalPointRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(rentalPointMapper::rentalPointToRentalPointDto)
                 .collect(Collectors.toList());
     }
@@ -136,8 +136,8 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, Pageable page) {
-        return scooterRepository.findAllByRentalPointIdAndStatusOrderById(rentalPointId, status, page).stream()
+    public List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, int page, int size) {
+        return scooterRepository.findAllByRentalPointIdAndStatusOrderById(rentalPointId, status, PageRequest.of(page, size)).stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
     }

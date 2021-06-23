@@ -25,7 +25,7 @@ import com.kurtsevich.rental.util.mapper.UserMapper;
 import com.kurtsevich.rental.util.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,8 +72,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> getAll(Pageable page) {
-        List<UserDto> userDtoList = userRepository.findAll(page).stream()
+    public List<UserDto> getAll(int page, int size) {
+        List<UserDto> userDtoList = userRepository.findAll(PageRequest.of(page, size)).stream()
                 .map(userMapper::userToUserDto)
                 .collect(Collectors.toList());
 
@@ -177,7 +177,7 @@ public class UserService implements IUserService {
             return userMapper.userToUserDto(user);
         } else {
             log.warn("In UserService:findProfileByUsername - username {} not found", username);
-            throw new ServiceException("Can't find user with username " + username);
+            throw new NotFoundEntityException("user profile by username " + username);
         }
     }
 

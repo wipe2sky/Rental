@@ -9,15 +9,17 @@ import java.time.LocalDate;
 
 @Data
 public class PassportDto {
+    @NotBlank(message = "passportNumber must not be null")
     @Pattern(regexp="([A-Z]{2}[0-9]{7})", message = "In passportNumber use only 2 uppercase english character and 9 digits")
     private String passportNumber;
 
+    @NotBlank(message = "identificationNumber must not be null")
     @Pattern(regexp="([0-9]{7}[A-Z][0-9]{3}[A-Z]{2}[0-9])", message = "In identificationNumber use only uppercase english character and digits")
     private String identificationNumber;
 
     @NotNull(message = "dateOfIssue must not be null")
     private LocalDate dateOfIssue;
 
-    @NotBlank(message = "dateOfExpire must not be null")
+    @NotNull(message = "dateOfExpire must not be null")
     private LocalDate dateOfExpire;
 }

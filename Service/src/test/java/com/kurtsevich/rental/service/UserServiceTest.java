@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -51,7 +50,6 @@ class UserServiceTest {
     private final String ENCODE_TEST_USER_PASSWORD = "$2a$10$vtHiPqVPyngypcR2MYsMPuOxlCkqc37b6";
     private CreateUserDto testCreateUserDto;
     private User testUser;
-    private Pageable page;
     private Page<User> testUserPage;
     private UserDto testUserDto;
     private UserDto testUserDto2;
@@ -98,7 +96,6 @@ class UserServiceTest {
                 .setPassword(ENCODE_TEST_USER_PASSWORD);
         List<User> testUserList = Arrays.asList(testUser, testUser2);
 
-        page = PageRequest.of(0, 2);
         testUserPage = new PageImpl<>(testUserList);
 
         testUserDto = new UserDto()
@@ -151,13 +148,13 @@ class UserServiceTest {
         when(userRepository.findAll(any(Pageable.class))).thenReturn(testUserPage);
         when(userMapper.userToUserDto(any(User.class)))
                 .thenReturn(testUserDto, testUserDto2);
-        assertEquals(testUserDtoList, userService.getAll(page));
+        assertEquals(testUserDtoList, userService.getAll(1, 1));
     }
 
     @Test
     void getAllExceptionTest() {
         when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>()));
-        assertThrows(ServiceException.class, () -> userService.getAll(page));
+        assertThrows(ServiceException.class, () -> userService.getAll(1, 1));
     }
 
     @Test

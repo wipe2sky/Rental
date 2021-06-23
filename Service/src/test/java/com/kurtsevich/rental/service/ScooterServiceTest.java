@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
@@ -44,7 +43,6 @@ class ScooterServiceTest {
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto;
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto2;
     private List<ScooterWithoutHistoriesDto> testScooterDtoList;
-    private Pageable page;
     private Page<Scooter> testScooterPage;
     private Scooter testScooter;
     private List<Scooter> testScooterList;
@@ -82,7 +80,6 @@ class ScooterServiceTest {
                 .setScooterModel(testScooterModel)
                 .setRentTerms(testRentTerms);
         testScooterList = Arrays.asList(testScooter, testScooter2);
-        page = PageRequest.of(0, 2);
         testScooterPage = new PageImpl<>(testScooterList);
     }
 
@@ -117,13 +114,13 @@ class ScooterServiceTest {
         when(scooterRepository.findAll(any(Pageable.class))).thenReturn(testScooterPage);
         when(scooterMapper.scooterToScooterWithoutHistoriesDto(any(Scooter.class)))
                 .thenReturn(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
-        assertEquals(testScooterDtoList, scooterService.getAll(page));
+        assertEquals(testScooterDtoList, scooterService.getAll(1, 1));
     }
 
     @Test
     void getAllPageIsEmptyExceptionTest() {
         when(scooterRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>()));
-        assertThrows(ServiceException.class, () -> scooterService.getAll(page));
+        assertThrows(ServiceException.class, () -> scooterService.getAll(1, 1));
     }
 
     @Test
@@ -138,6 +135,6 @@ class ScooterServiceTest {
         when(scooterRepository.findAllByScooterModelId(anyLong(), any(Pageable.class))).thenReturn(testScooterList);
         when(scooterMapper.scooterToScooterWithoutHistoriesDto(any(Scooter.class)))
                 .thenReturn(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
-        assertEquals(testScooterDtoList, scooterService.findAllScootersByModelId(1L, page));
+        assertEquals(testScooterDtoList, scooterService.findAllScootersByModelId(1L, 1, 1));
     }
 }

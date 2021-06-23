@@ -4,9 +4,7 @@ import com.kurtsevich.rental.dto.history.FinishedHistoryDto;
 import com.kurtsevich.rental.dto.history.FinishedTripDto;
 import com.kurtsevich.rental.dto.history.HistoryDto;
 import com.kurtsevich.rental.dto.user.UserProfileScooterAndPriceDto;
-import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IHistoryService {
@@ -14,11 +12,11 @@ public interface IHistoryService {
 
     FinishedHistoryDto finishHistory(FinishedTripDto finishedTripDto);
 
-    List<HistoryDto> findAllHistoryByUsername(String username, Pageable page);
+    List<HistoryDto> findAllHistoryByUsername(String username, int page, int size);
 
     HistoryDto findActualHistoryByUsername(String username);
 
-    List<HistoryDto> findByScooterId(Long scooterId, Pageable page);
+    List<HistoryDto> findByScooterId(Long scooterId, int page, int size);
 
-    List<HistoryDto> findByDate(LocalDateTime date, Pageable page);
+    List<HistoryDto> findByDate(int page, int size, String startDate, String endDate);
 }

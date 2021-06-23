@@ -4,8 +4,6 @@ import com.kurtsevich.rental.api.service.IScooterModelService;
 import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
 import com.kurtsevich.rental.dto.scooter.UpdateScooterModelDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,36 +21,35 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/scooters")
+@RequestMapping("/scooters-models")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
 public class ScooterModelController {
     private final IScooterModelService scooterModelService;
 
-    @PutMapping("/models")
+    @PutMapping
     public ResponseEntity<Void> add(@RequestBody @Valid ScooterModelDto scooterModelDto) {
         scooterModelService.add(scooterModelDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/models")
+    @GetMapping
     public ResponseEntity<List<ScooterModelDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(scooterModelService.getAll(pageable));
+        return ResponseEntity.ok(scooterModelService.getAll(page, size));
     }
 
-    @GetMapping("/models/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ScooterModelDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(scooterModelService.getById(id));
     }
 
-    @DeleteMapping("/models/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         scooterModelService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("models")
+    @PatchMapping
     public ResponseEntity<Void> update(@RequestBody @Valid UpdateScooterModelDto scooterModelDto) {
         scooterModelService.update(scooterModelDto);
         return ResponseEntity.noContent().build();

@@ -2,12 +2,9 @@ package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IScooterService;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.ScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,8 +36,7 @@ public class ScooterController {
     @GetMapping
     public ResponseEntity<List<ScooterWithoutHistoriesDto>> getAll(@RequestParam("page") int page,
                                                                    @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(scooterService.getAll(pageable));
+        return ResponseEntity.ok(scooterService.getAll(page, size));
     }
 
     @GetMapping("/{id}")
@@ -66,11 +62,10 @@ public class ScooterController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/models")
+    @GetMapping("/models/{id}")
     public ResponseEntity<List<ScooterWithoutHistoriesDto>> findAllByModelId(@PathVariable Long id,
-                                                             @RequestParam("page") int page,
-                                                             @RequestParam("size") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(scooterService.findAllScootersByModelId(id, pageable));
+                                                                             @RequestParam("page") int page,
+                                                                             @RequestParam("size") int size) {
+        return ResponseEntity.ok(scooterService.findAllScootersByModelId(id, page, size));
     }
 }

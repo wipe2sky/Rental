@@ -4,7 +4,6 @@ import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,6 +18,5 @@ public class UserDto {
     @NotNull(message = "userProfile must not be null")
     private UserProfileDto userProfile;
 
-    @NotEmpty(message = "roles must not be null")
     private List<RoleWithoutUsersDto> roles;
 }

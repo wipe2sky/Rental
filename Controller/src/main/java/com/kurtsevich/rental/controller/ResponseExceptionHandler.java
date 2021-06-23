@@ -22,7 +22,7 @@ import java.util.List;
 
 @ControllerAdvice
 @Slf4j
-public class MyExceptionHandler extends ResponseEntityExceptionHandler {
+public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NotFoundEntityException.class)
     private ResponseEntity<ExceptionDto> handleNotFoundEntityException(NotFoundEntityException ex) {

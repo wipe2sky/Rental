@@ -33,13 +33,13 @@ public class UserProfileController {
         return ResponseEntity.ok(userService.findProfileByUsername(username));
     }
 
-    @PutMapping("/reg")
+    @PutMapping
     public ResponseEntity<Void> registration(@RequestBody @Valid CreateUserDto createUserDto) {
         userService.register(createUserDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping("/password")
+    @PatchMapping("/passwords")
     @PreAuthorize("#changeUserPasswordDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
         userService.changeUserPassword(changeUserPasswordDto);
@@ -55,7 +55,7 @@ public class UserProfileController {
 
     @PutMapping("/passports")
     @PreAuthorize("#editPassportDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> editPassport(@RequestBody EditPassportDto editPassportDto) {
+    public ResponseEntity<Void> editPassport(@RequestBody @Valid EditPassportDto editPassportDto) {
         userService.editPassport(editPassportDto);
         return ResponseEntity.noContent().build();
     }

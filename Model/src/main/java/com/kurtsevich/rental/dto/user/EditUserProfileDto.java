@@ -10,6 +10,7 @@ public class EditUserProfileDto {
     @NotBlank(message = "username must not be null")
     private String username;
 
+    @NotBlank(message = "phoneNumber must not be null")
     @Pattern(regexp="([0-9]{12})", message = "Use only digits, size 12")
     private String phoneNumber;
 
