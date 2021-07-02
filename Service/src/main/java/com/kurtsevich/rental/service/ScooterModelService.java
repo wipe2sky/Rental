@@ -11,6 +11,8 @@ import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -20,28 +22,29 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class ScooterModelService implements IScooterModelService {
     private final ScooterModelRepository scooterModelRepository;
     private final ScooterModelMapper mapper;
 
     @Override
+    @Transactional
     public void add(ScooterModelDto scooterModelDto) {
         ScooterModel scooterModel = mapper.scooterModelDtoToScooterModel(scooterModelDto);
-        scooterModelRepository.saveAndFlush(scooterModel);
+        scooterModelRepository.save(scooterModel);
         log.info("IN ScooterModelService:add - scooterModel {} created", scooterModel);
     }
 
     @Override
-    public List<ScooterModelDto> getAll(int page, int size) {
-        List<ScooterModelDto> result = scooterModelRepository.findAll(PageRequest.of(page, size)).stream()
+    public Page<ScooterModelDto> getAll(int page, int size) {
+        Page<ScooterModel> scooterModels = scooterModelRepository.findAll(PageRequest.of(page, size));
+        List<ScooterModelDto> result = scooterModels.getContent().stream()
                 .map(mapper::scooterModelToScooterModelDto)
                 .collect(Collectors.toList());
         if (result.isEmpty()) {
             throw new ServiceException("Request page number greater than available");
         }
-        return result;
+        return new PageImpl<>(result, PageRequest.of(page, size), scooterModels.getTotalElements());
     }
 
     @Override
@@ -51,6 +54,7 @@ public class ScooterModelService implements IScooterModelService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         scooterModelRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id))
@@ -60,18 +64,17 @@ public class ScooterModelService implements IScooterModelService {
     }
 
     @Override
+    @Transactional
     public void update(UpdateScooterModelDto scooterModelDto) {
-        ScooterModel scooterModel = scooterModelRepository.findByModel(scooterModelDto.getModel());
-        if (scooterModel == null) {
-            throw new NotFoundEntityException(scooterModelDto.getModel());
-        }
+        ScooterModel scooterModel = scooterModelRepository.findByModel(scooterModelDto.getModel())
+                .orElseThrow(() -> new NotFoundEntityException(scooterModelDto.getModel()));
         mapper.update(scooterModel, scooterModelDto);
         log.info("IN ScooterModelService:add - scooterModel {} updated", scooterModel);
-
     }
 
     @Override
     public ScooterModelDto findByModel(String model) {
-        return mapper.scooterModelToScooterModelDto(scooterModelRepository.findByModel(model));
+        return mapper.scooterModelToScooterModelDto(scooterModelRepository.findByModel(model)
+                .orElseThrow(() -> new NotFoundEntityException(model)));
     }
 }

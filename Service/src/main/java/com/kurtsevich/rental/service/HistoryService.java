@@ -18,6 +18,8 @@ import com.kurtsevich.rental.model.UserProfile;
 import com.kurtsevich.rental.util.mapper.HistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class HistoryService implements IHistoryService {
     private static final int CORRECTION_TIME_IN_SECONDS = 600;
@@ -42,6 +43,7 @@ public class HistoryService implements IHistoryService {
     private final HistoryMapper historyMapper;
 
     @Override
+    @Transactional
     public void createHistory(UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
         UserProfile userProfile = userProfileRepository.findById(userProfileScooterAndPriceDto.getUserProfileId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getUserProfileId()));
@@ -63,7 +65,7 @@ public class HistoryService implements IHistoryService {
         if (userProfileScooterAndPriceDto.getPrice() != null) {
             history.setPrice(BigDecimal.valueOf(userProfileScooterAndPriceDto.getPrice()));
         }
-        historyRepository.saveAndFlush(history);
+        historyRepository.save(history);
 
         log.info("IN HistoryService:createHistory - history successfully created");
     }
@@ -84,18 +86,20 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
+    @Transactional
     public FinishedHistoryDto finishHistory(FinishedTripDto finishedTripDto) {
         UserProfile userProfile = userProfileRepository.findById(finishedTripDto.getUserProfileId())
                 .orElseThrow(() -> new NotFoundEntityException(finishedTripDto.getUserProfileId()));
-        History history = historyRepository.findHistoryByUserProfileAndIsActualIsTrue(userProfile);
+        History history = historyRepository.findHistoryByUserProfileAndIsActualIsTrue(userProfile)
+                .orElseThrow(() -> new NotFoundEntityException("History by username " + userProfile.getUser().getUsername()));
 
-        if (history == null || !history.isActual()) {
-            throw new ServiceException("History is not found or not actual.");
+        if (!history.isActual()) {
+            throw new ServiceException("History is not actual.");
         }
 
         Scooter scooter = history.getScooter();
 
-        int discount =  finishedTripDto.getDiscount() != 0
+        int discount = finishedTripDto.getDiscount() != 0
                 && finishedTripDto.getDiscount() > userProfile.getDiscount()
                 ? finishedTripDto.getDiscount()
                 : userProfile.getDiscount();
@@ -121,7 +125,7 @@ public class HistoryService implements IHistoryService {
 
         log.info("IN HistoryService:finishHistory - history successfully finished");
 
-        return createFinishedHistoryDto(history, finishedTripDto.getMileage(), (int)travelTime, sumWithDiscount, amountToPay);
+        return createFinishedHistoryDto(history, finishedTripDto.getMileage(), (int) travelTime, sumWithDiscount, amountToPay);
     }
 
     private double checkAmountToPayAndPrepayments(UserProfile userProfile, double prepayments, double sumWithDiscount) {
@@ -162,47 +166,53 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<HistoryDto> findAllHistoryByUsername(String username, int page, int size) {
-        List<HistoryDto> historyDtoList = historyRepository.findAllByUsername(username, PageRequest.of(page, size)).stream()
+    public Page<HistoryDto> findAllHistoryByUsername(String username, int page, int size) {
+        Page<History> historiesPage = historyRepository.findAllByUsername(username, PageRequest.of(page, size));
+        List<HistoryDto> historyDtoList = historiesPage.getContent().stream()
                 .map(historyMapper::historyToHistoryDto)
                 .collect(Collectors.toList());
-        if (historyDtoList.isEmpty()){
+
+        if (historyDtoList.isEmpty()) {
             throw new NotFoundEntityException(" histories at user " + username);
         }
-        return historyDtoList;
+        return new PageImpl<>(historyDtoList, PageRequest.of(page, size), historiesPage.getTotalElements());
     }
 
     @Override
     public HistoryDto findActualHistoryByUsername(String username) {
-        UserProfile userProfile = userRepository.findByUsername(username).getUserProfile();
-        HistoryDto historyDto = historyMapper.historyToHistoryDto(historyRepository.findHistoryByUserProfileAndIsActualIsTrue(userProfile));
-        if (historyDto == null){
-            throw new NotFoundEntityException("actual history at user " + username);
-        }
-        return historyDto;
+        UserProfile userProfile = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundEntityException("user by username " + username))
+                .getUserProfile();
+
+        return historyMapper.historyToHistoryDto(historyRepository.findHistoryByUserProfileAndIsActualIsTrue(userProfile)
+                .orElseThrow(() -> new NotFoundEntityException("actual history at user " + username)));
     }
 
     @Override
-    public List<HistoryDto> findByScooterId(Long scooterId, int page, int size) {
-        List<HistoryDto> historyDtoList = historyRepository.findAllByScooterId(scooterId, PageRequest.of(page, size)).stream()
+    public Page<HistoryDto> findByScooterId(Long scooterId, int page, int size) {
+        Page<History> histories = historyRepository.findAllByScooterId(scooterId, PageRequest.of(page, size));
+
+        List<HistoryDto> historyDtoList = histories.getContent().stream()
                 .map(historyMapper::historyToHistoryDto)
                 .collect(Collectors.toList());
-        if (historyDtoList.isEmpty()){
+        if (historyDtoList.isEmpty()) {
             throw new NotFoundEntityException("histories at scooter with id " + scooterId);
         }
-        return historyDtoList;
+        return new PageImpl<>(historyDtoList, PageRequest.of(page, size), histories.getTotalElements());
+
     }
 
     @Override
-    public List<HistoryDto> findByDate(int page, int size, String startDate, String endDate) {
+    public Page<HistoryDto> findByDate(int page, int size, String startDate, String endDate) {
         LocalDateTime start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
         LocalDateTime finish = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().plusDays(1);
-        List<HistoryDto> historyDtoList = historyRepository.findAllByDate(start, finish, PageRequest.of(page, size)).stream()
+        Page<History> histories = historyRepository.findAllByDate(start, finish, PageRequest.of(page, size));
+        List<HistoryDto> historyDtoList = histories.getContent().stream()
                 .map(historyMapper::historyToHistoryDto)
                 .collect(Collectors.toList());
-        if (historyDtoList.isEmpty()){
+        if (historyDtoList.isEmpty()) {
             throw new NotFoundEntityException(" histories at current dates");
         }
-        return historyDtoList;
+        return new PageImpl<>(historyDtoList, PageRequest.of(page, size), histories.getTotalElements());
     }
 }

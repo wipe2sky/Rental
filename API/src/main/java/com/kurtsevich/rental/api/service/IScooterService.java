@@ -3,13 +3,12 @@ package com.kurtsevich.rental.api.service;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IScooterService {
     void add(AddScooterDto addScooterDto);
 
-    List<ScooterWithoutHistoriesDto> getAll(int page, int size);
+    Page<ScooterWithoutHistoriesDto> getAll(int page, int size);
 
     ScooterWithoutHistoriesDto getById(Long id);
 
@@ -19,5 +18,5 @@ public interface IScooterService {
 
     void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto);
 
-    List<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size);
+    Page<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size);
 }

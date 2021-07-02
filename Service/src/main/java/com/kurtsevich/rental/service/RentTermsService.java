@@ -9,6 +9,8 @@ import com.kurtsevich.rental.model.RentTerms;
 import com.kurtsevich.rental.util.mapper.RentTermsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,20 +21,21 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class RentTermsService implements IRentTermsService {
     private final RentTermsRepository rentTermsRepository;
     private final RentTermsMapper rentTermsMapper;
 
     @Override
+    @Transactional
     public void add(RentTermsDto rentTermsDto) {
         RentTerms rentTerms = rentTermsMapper.rentTermsDtoToRentTerms(rentTermsDto);
-        rentTermsRepository.saveAndFlush(rentTerms);
+        rentTermsRepository.save(rentTerms);
         log.info("IN RentTermsService:add - Rent term {} added successfully", rentTerms);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         rentTermsRepository.delete(rentTermsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id)));
@@ -41,11 +44,9 @@ public class RentTermsService implements IRentTermsService {
     }
 
     @Override
+    @Transactional
     public void update(Long id, UpdateRentTermsDto rentTermsDto) {
         RentTerms rentTerms = rentTermsRepository.findById(id).orElseThrow(() -> new NotFoundEntityException(id));
-        if (rentTerms == null) {
-            throw new NotFoundEntityException(id);
-        }
         rentTermsMapper.update(rentTerms, rentTermsDto);
         log.info("IN RentTermsService:update - Rent term id {} upadated successfully", id);
 
@@ -58,16 +59,20 @@ public class RentTermsService implements IRentTermsService {
     }
 
     @Override
-    public List<RentTermsDto> getAll(int page, int size) {
-        return rentTermsRepository.findAll(PageRequest.of(page, size)).stream()
+    public Page<RentTermsDto> getAll(int page, int size) {
+        Page<RentTerms> rentTerms = rentTermsRepository.findAll(PageRequest.of(page, size));
+        List<RentTermsDto> rentTermsDto = rentTerms.getContent().stream()
                 .map(rentTermsMapper::rentTermsToRentTermsDto)
                 .collect(Collectors.toList());
+        return new PageImpl<>(rentTermsDto, PageRequest.of(page, size), rentTerms.getTotalElements());
     }
 
     @Override
-    public List<RentTermsDto> getSortBy(int page, int size, String sortVar) {
-        return rentTermsRepository.findAll(PageRequest.of(page, size, Sort.by(sortVar))).stream()
+    public Page<RentTermsDto> getSortBy(int page, int size, String sortVar) {
+        Page<RentTerms> rentTerms = rentTermsRepository.findAll(PageRequest.of(page, size, Sort.by(sortVar)));
+        List<RentTermsDto> rentTermsDto = rentTerms.getContent().stream()
                 .map(rentTermsMapper::rentTermsToRentTermsDto)
                 .collect(Collectors.toList());
+        return new PageImpl<>(rentTermsDto, PageRequest.of(page, size), rentTerms.getTotalElements());
     }
 }

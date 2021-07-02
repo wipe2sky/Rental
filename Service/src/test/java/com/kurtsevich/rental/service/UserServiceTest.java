@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,11 +51,14 @@ class UserServiceTest {
     private final String ENCODE_TEST_USER_PASSWORD = "$2a$10$vtHiPqVPyngypcR2MYsMPuOxlCkqc37b6";
     private CreateUserDto testCreateUserDto;
     private User testUser;
+    private Optional<User> optionalTestUser;
     private Page<User> testUserPage;
     private UserDto testUserDto;
     private UserDto testUserDto2;
     private List<UserDto> testUserDtoList;
+    private Page<UserDto> testUserDtoPage;
     private Role testRole;
+    private Optional<Role> optionalTestRole;
     private Passport testPassport;
     private UserProfile testUserProfile;
     @InjectMocks
@@ -77,7 +81,6 @@ class UserServiceTest {
         testCreateUserDto = new CreateUserDto()
                 .setUsername("testUser2")
                 .setPassword("test")
-                .setStatus(Status.ACTIVE)
                 .setPhoneNumber("111111111111")
                 .setFirstName("Bob")
                 .setLastName("Marley")
@@ -94,9 +97,11 @@ class UserServiceTest {
         User testUser2 = new User()
                 .setUsername("testUser2")
                 .setPassword(ENCODE_TEST_USER_PASSWORD);
-        List<User> testUserList = Arrays.asList(testUser, testUser2);
 
-        testUserPage = new PageImpl<>(testUserList);
+        List<User> testUserList = Arrays.asList(testUser, testUser2);
+        optionalTestUser = Optional.ofNullable(testUser);
+
+        testUserPage = new PageImpl<>(testUserList, PageRequest.of(0, 2), 2);
 
         testUserDto = new UserDto()
                 .setUsername("testUser")
@@ -105,6 +110,7 @@ class UserServiceTest {
                 .setUsername("testUser2")
                 .setPassword(ENCODE_TEST_USER_PASSWORD);
         testUserDtoList = Arrays.asList(testUserDto, testUserDto2);
+        testUserDtoPage = new PageImpl<>(testUserDtoList, PageRequest.of(0, 2), 2);
 
         testUserProfile = new UserProfile()
                 .setStatus(Status.ACTIVE)
@@ -113,9 +119,11 @@ class UserServiceTest {
                 .setLastName("Marley");
         testRole = new Role()
                 .setName("ROLE_USER")
-                .setStatus(Status.ACTIVE)
                 .setCreated(LocalDateTime.now())
                 .setUpdated(LocalDateTime.now());
+
+        optionalTestRole = Optional.ofNullable(testRole);
+
         testPassport = new Passport()
                 .setPassportNumber("MP4678344")
                 .setIdentificationNumber("3870364PB03000")
@@ -128,19 +136,19 @@ class UserServiceTest {
 
         when(userMapper.createdUserDtoToUser(testCreateUserDto)).thenReturn(testUser);
         when(passwordEncoder.encode(testCreateUserDto.getPassword())).thenReturn(ENCODE_TEST_USER_PASSWORD);
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(testRole);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(optionalTestRole);
         when(userMapper.createdUserDtoToPassport(testCreateUserDto)).thenReturn(testPassport);
         when(userMapper.createdUserDtoToUserProfile(testCreateUserDto)).thenReturn(testUserProfile);
 
-        when(userRepository.saveAndFlush(testUser)).thenReturn(testUser);
-        when(passportRepository.saveAndFlush(testPassport)).thenReturn(testPassport);
-        when(userProfileRepository.saveAndFlush(testUserProfile)).thenReturn(testUserProfile);
+        when(userRepository.save(testUser)).thenReturn(testUser);
+        when(passportRepository.save(testPassport)).thenReturn(testPassport);
+        when(userProfileRepository.save(testUserProfile)).thenReturn(testUserProfile);
 
         userService.register(testCreateUserDto);
 
-        verify(userRepository, times(1)).saveAndFlush(testUser);
-        verify(passportRepository, times(1)).saveAndFlush(testPassport);
-        verify(userProfileRepository, times(1)).saveAndFlush(testUserProfile);
+        verify(userRepository, times(1)).save(testUser);
+        verify(passportRepository, times(1)).save(testPassport);
+        verify(userProfileRepository, times(1)).save(testUserProfile);
     }
 
     @Test
@@ -148,7 +156,7 @@ class UserServiceTest {
         when(userRepository.findAll(any(Pageable.class))).thenReturn(testUserPage);
         when(userMapper.userToUserDto(any(User.class)))
                 .thenReturn(testUserDto, testUserDto2);
-        assertEquals(testUserDtoList, userService.getAll(1, 1));
+        assertEquals(testUserDtoPage, userService.getAll(0, 2));
     }
 
     @Test
@@ -184,7 +192,8 @@ class UserServiceTest {
 
     @Test
     void changeUserPasswordExceptionSamePasswordTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(testUser.setUserProfile(testUserProfile));
+        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
+        optionalTestUser.get().setUserProfile(testUserProfile);
         assertThrows(AuthenticationServiceException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")
@@ -194,7 +203,8 @@ class UserServiceTest {
 
     @Test
     void changeUserPasswordExceptionIncorrectPasswordTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(testUser.setUserProfile(testUserProfile));
+        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
+        optionalTestUser.get().setUserProfile(testUserProfile);
         assertThrows(AuthenticationServiceException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")
@@ -204,8 +214,6 @@ class UserServiceTest {
 
     @Test
     void changeUserPasswordExceptionUserIsNullTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(null);
-
         assertThrows(NotFoundEntityException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")));
@@ -213,8 +221,8 @@ class UserServiceTest {
 
     @Test
     void changeUserPasswordExceptionUserIsNotActualStatusTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(testUser.setUserProfile(testUserProfile.setStatus(Status.NOT_ACTIVE)));
-
+        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
+        optionalTestUser.get().setUserProfile(testUserProfile.setStatus(Status.NOT_ACTIVE));
         assertThrows(ServiceException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")));

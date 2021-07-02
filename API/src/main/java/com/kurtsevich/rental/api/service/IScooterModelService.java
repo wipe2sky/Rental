@@ -2,13 +2,12 @@ package com.kurtsevich.rental.api.service;
 
 import com.kurtsevich.rental.dto.scooter.ScooterModelDto;
 import com.kurtsevich.rental.dto.scooter.UpdateScooterModelDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IScooterModelService {
     void add(ScooterModelDto scooterModelDto);
 
-    List<ScooterModelDto> getAll(int page, int size);
+    Page<ScooterModelDto> getAll(int page, int size);
 
     ScooterModelDto getById(Long id);
 

@@ -5,6 +5,7 @@ import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.dto.exception.ExceptionDto;
 import com.kurtsevich.rental.dto.exception.ValidationExceptionDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,15 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         exceptionDto.setMessages(details);
         log.error(details.toString());
         return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    private ResponseEntity<ExceptionDto> handleDataAccessException(DataAccessException ex) {
+        log.error(Arrays.toString(ex.getStackTrace()));
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getCause().getCause().getLocalizedMessage())
+                , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ServiceException.class)

@@ -17,7 +17,6 @@ import javax.transaction.Transactional;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class AuthenticationService implements IAuthenticationService {
     private final AuthenticationManager authenticationManager;
@@ -25,6 +24,7 @@ public class AuthenticationService implements IAuthenticationService {
     private final IUserService userService;
 
     @Override
+    @Transactional
     public UserTokenDto login(AuthenticationRequestDto requestDto) {
         String username = requestDto.getUsername();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));

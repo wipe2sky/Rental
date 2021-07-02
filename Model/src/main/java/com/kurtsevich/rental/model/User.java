@@ -6,8 +6,6 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -27,12 +25,7 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_role",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private List<Role> roles;
 
 }

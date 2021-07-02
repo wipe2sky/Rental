@@ -18,6 +18,8 @@ import com.kurtsevich.rental.util.mapper.RentalPointMapper;
 import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class RentalPointService implements IRentalPointService {
     private final RentalPointRepository rentalPointRepository;
@@ -38,10 +39,11 @@ public class RentalPointService implements IRentalPointService {
     private final ScooterMapper scooterMapper;
 
     @Override
+    @Transactional
     public void add(RentalPointWithoutScootersDto rentalPointWithoutScootersDto) {
         RentalPoint rentalPoint = rentalPointMapper
                 .rentalPointWithoutScootersDtoToRentalPoint(rentalPointWithoutScootersDto);
-        rentalPointRepository.saveAndFlush(rentalPoint);
+        rentalPointRepository.save(rentalPoint);
         log.info("IN RentalPointService:add - rental point {} successfully created", rentalPoint);
     }
 
@@ -49,18 +51,21 @@ public class RentalPointService implements IRentalPointService {
     public RentalPointDto getById(Long id) {
         return rentalPointMapper
                 .rentalPointToRentalPointDto(rentalPointRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(id)));
+                        .orElseThrow(() -> new NotFoundEntityException(id)));
     }
 
     @Override
-    public List<RentalPointDto> getAll(int page, int size) {
-
-        return rentalPointRepository.findAll(PageRequest.of(page, size)).stream()
+    public Page<RentalPointDto> getAll(int page, int size) {
+        Page<RentalPoint> rentalPoints = rentalPointRepository.findAll(PageRequest.of(page, size));
+        List<RentalPointDto> rentalPointsDto = rentalPoints.getContent().stream()
                 .map(rentalPointMapper::rentalPointToRentalPointDto)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(rentalPointsDto, PageRequest.of(page, size), rentalPoints.getTotalElements());
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         RentalPoint rentalPoint = rentalPointRepository
                 .findById(id).orElseThrow(() -> new NotFoundEntityException(id));
@@ -74,6 +79,7 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
+    @Transactional
     public void updatePhoneNumber(Long id, String phoneNumber) {
         rentalPointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id))
@@ -83,31 +89,33 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
+    @Transactional
     public void updateStatus(Long id, Status status) {
 
         RentalPoint rentalPoint = rentalPointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id));
 
-        if(status.equals(rentalPoint.getStatus())){
+        if (status.equals(rentalPoint.getStatus())) {
             log.warn("IN RentalPointService:updateStatus - Impossible to replace status with same");
             throw new ServiceException("Impossible to replace status with same");
-        }else if(status.equals(Status.ACTIVE) || status.equals(Status.NOT_ACTIVE)){
+        } else if (status.equals(Status.ACTIVE) || status.equals(Status.NOT_ACTIVE)) {
             rentalPoint.setStatus(status);
             log.info("IN RentalPointService:updateStatus - changed status from {} to {} in rental point with id {}",
                     rentalPoint.getStatus(), status, id);
-        }else {
+        } else {
             log.warn("IN RentalPointService:updateStatus - status: {} incorrect", rentalPoint.getStatus());
             throw new ServiceException("Incorrect rental point status");
         }
     }
 
     @Override
+    @Transactional
     public void addScooterToRentalPoint(RentalPointScooterDto rentalPointScooterDto) {
         Scooter scooter = scooterRepository.findById(rentalPointScooterDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getScooterId()));
-        if (Status.BOOKED.equals(scooter.getStatus())){
+        if (Status.BOOKED.equals(scooter.getStatus())) {
             log.warn("IN RentalPointService:addScooterToRentalPoint - Can't add scooter. Scooter with id {} is booked now", scooter.getId());
-            throw new ServiceException("Can't add scooter with id" + scooter.getId() +  ". It BOOKED now");
+            throw new ServiceException("Can't add scooter with id" + scooter.getId() + ". It BOOKED now");
         }
 
         RentalPoint rentalPoint = rentalPointRepository.findById(rentalPointScooterDto.getRentalPointId())
@@ -119,27 +127,29 @@ public class RentalPointService implements IRentalPointService {
     }
 
     @Override
+    @Transactional
     public void removeScooterFromRentalPoint(RentalPointScooterDto rentalPointScooterDto) {
         Scooter scooter = scooterRepository.findById(rentalPointScooterDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getScooterId()));
 
         RentalPoint rentalPoint = rentalPointRepository.findById(rentalPointScooterDto.getRentalPointId())
                 .orElseThrow(() -> new NotFoundEntityException(rentalPointScooterDto.getRentalPointId()));
-        if(rentalPoint.getScooters().contains(scooter) && Status.ACTIVE.equals(scooter.getStatus())) {
+        if (rentalPoint.getScooters().contains(scooter) && Status.ACTIVE.equals(scooter.getStatus())) {
             scooter.setRentalPoint(null);
             scooter.setStatus(Status.NOT_ACTIVE);
-        }else {
+        } else {
             throw new ServiceException(String.format("Scooter with id %s not exist at rental point with id %s", rentalPointScooterDto.getScooterId(), rentalPointScooterDto.getRentalPointId()));
         }
         log.info("IN RentalPointService:addScooterToRentalPoint - removed scooter {} of rental point with id {}", scooter, rentalPointScooterDto.getRentalPointId());
-
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, int page, int size) {
-        return scooterRepository.findAllByRentalPointIdAndStatusOrderById(rentalPointId, status, PageRequest.of(page, size)).stream()
+    public Page<ScooterWithoutHistoriesDto> getScootersInRentalPointByStatus(Long rentalPointId, Status status, int page, int size) {
+        Page<Scooter> scooters = scooterRepository.findAllByRentalPointIdAndStatusOrderById(rentalPointId, status, PageRequest.of(page, size));
+        List<ScooterWithoutHistoriesDto> scooterWithoutHistoriesDtoList = scooters.getContent().stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
+        return new PageImpl<>(scooterWithoutHistoriesDtoList, PageRequest.of(page, size), scooters.getTotalElements());
     }
 
     @Override
@@ -155,7 +165,7 @@ public class RentalPointService implements IRentalPointService {
             if (rp.getStatus().equals(Status.ACTIVE)) {
                 RentalPointWithDistanceDto actualDto = rentalPointMapper
                         .rentalPointToRentalPointWithDistanceDto(rp);
-                actualDto.setDistance( MapUtil
+                actualDto.setDistance(MapUtil
                         .getDistanceInMeters(longitude, latitude, rp.getLongitude(), rp.getLatitude()));
                 result.add(actualDto);
             }

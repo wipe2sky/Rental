@@ -9,12 +9,14 @@ import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
 import com.kurtsevich.rental.dto.user.UserStatusDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +34,7 @@ public class RootController {
     private final IRoleService roleService;
 
     @GetMapping(value = "/users")
-    public ResponseEntity<List<UserDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
+    public ResponseEntity<Page<UserDto>> getAll(@RequestParam("page") int page, @RequestParam("size") int size) {
         return ResponseEntity.ok(userService.getAll(page, size));
     }
 
@@ -41,7 +43,7 @@ public class RootController {
         return ResponseEntity.ok(userService.getById(id));
     }
 
-    @PutMapping("/users")
+    @PostMapping("/users")
     public ResponseEntity<Void> addUser(@RequestBody @Valid CreateUserDto createUserDto) {
         userService.register(createUserDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -59,9 +61,15 @@ public class RootController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/roles")
+    @PostMapping("/roles")
     public ResponseEntity<Void> addRole(@RequestBody @Valid RoleWithoutUsersDto roleWithoutUsersDto) {
         roleService.add(roleWithoutUsersDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/roles/{id}")
+    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+        roleService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -8,6 +8,7 @@ import com.kurtsevich.rental.dto.rental_point.RentalPointWithDistanceDto;
 import com.kurtsevich.rental.dto.rental_point.RentalPointWithoutScootersDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +53,7 @@ public class RentalPointController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/scooters")
+    @PostMapping("/scooters")
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     public ResponseEntity<Void> addScooter(@RequestBody @Valid RentalPointScooterDto rentalPointScooterDto) {
         rentalPointService.addScooterToRentalPoint(rentalPointScooterDto);
@@ -67,14 +69,14 @@ public class RentalPointController {
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping
-    public ResponseEntity<List<RentalPointDto>> getAll(@RequestParam("page") int page,
+    public ResponseEntity<Page<RentalPointDto>> getAll(@RequestParam("page") int page,
                                                        @RequestParam("size") int size) {
         return ResponseEntity.ok(rentalPointService.getAll(page, size));
     }
 
     @PreAuthorize(AUTHENTICATION_ROLE_ADMIN_OR_WORKER)
     @GetMapping("/{id}/scooters")
-    public ResponseEntity<List<ScooterWithoutHistoriesDto>> getScootersByStatusSortBy(@PathVariable Long id,
+    public ResponseEntity<Page<ScooterWithoutHistoriesDto>> getScootersByStatusSortBy(@PathVariable Long id,
                                                                                       @RequestParam("page") int page,
                                                                                       @RequestParam("size") int size,
                                                                                       @RequestParam("status") String status) {

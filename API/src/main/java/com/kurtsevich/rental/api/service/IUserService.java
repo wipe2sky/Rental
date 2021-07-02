@@ -10,13 +10,12 @@ import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.dto.user.UserRoleDto;
 import com.kurtsevich.rental.dto.user.UserStatusDto;
 import com.kurtsevich.rental.model.User;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IUserService {
     void register(CreateUserDto createUserDto);
 
-    List<UserDto> getAll(int page, int size);
+    Page<UserDto> getAll(int page, int size);
 
     UserDto getById(Long id);
 

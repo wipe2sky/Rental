@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class JwtUsersDetailsService implements UserDetailsService {
-    private IUserService userService;
+    private final IUserService userService;
 
     public JwtUsersDetailsService(@Lazy IUserService userService) {
         this.userService = userService;

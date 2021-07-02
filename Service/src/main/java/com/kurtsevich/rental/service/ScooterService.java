@@ -15,6 +15,8 @@ import com.kurtsevich.rental.model.ScooterModel;
 import com.kurtsevich.rental.util.mapper.ScooterMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class ScooterService implements IScooterService {
     private final ScooterRepository scooterRepository;
@@ -33,18 +34,15 @@ public class ScooterService implements IScooterService {
     private final ScooterMapper scooterMapper;
 
     @Override
+    @Transactional
     public void add(AddScooterDto addScooterDto) {
         Scooter scooter = scooterMapper.addScooterDtoToScooter(addScooterDto);
-        ScooterModel scooterModel = scooterModelRepository.findByModel(addScooterDto.getScooterModelName());
-
-        if (scooterModel == null) {
-            log.error("Couldn't find scooter model by name {}", addScooterDto.getScooterModelName());
-            throw new ServiceException("Couldn't find scooter model by name " + addScooterDto.getScooterModelName());
-        }
+        ScooterModel scooterModel = scooterModelRepository.findByModel(addScooterDto.getScooterModelName())
+                .orElseThrow(() -> new NotFoundEntityException("scooter by model name " + addScooterDto.getScooterModelName()));
 
         if (scooterModel.getStatus().equals(Status.ACTIVE)) {
             scooter.setScooterModel(scooterModel);
-            scooterRepository.saveAndFlush(scooter);
+            scooterRepository.save(scooter);
             log.info("IN ScooterService:add - scooter {} added", scooter);
         } else {
             throw new ServiceException("Scooter model not found or not active");
@@ -53,15 +51,16 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> getAll(int page, int size) {
-        List<ScooterWithoutHistoriesDto> scooterDtoList = scooterRepository.findAll(PageRequest.of(page, size)).stream()
+    public Page<ScooterWithoutHistoriesDto> getAll(int page, int size) {
+        Page<Scooter> scooters = scooterRepository.findAll(PageRequest.of(page, size));
+        List<ScooterWithoutHistoriesDto> scooterDtoList = scooters.getContent().stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
         if (scooterDtoList.isEmpty()) {
             log.warn("IN ScooterService:getAll - Request page number greater than available");
             throw new ServiceException("Request page number greater than available");
         }
-        return scooterDtoList;
+        return new PageImpl<>(scooterDtoList, PageRequest.of(page, size), scooters.getTotalElements());
     }
 
     @Override
@@ -71,6 +70,7 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         scooterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(id))
@@ -80,6 +80,7 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
+    @Transactional
     public void addRentTermsToScooter(ScooterRentTermsDto scooterRentTermsDto) {
         scooterRepository.findById(scooterRentTermsDto.getId())
                 .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()))
@@ -91,6 +92,7 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
+    @Transactional
     public void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto) {
         Scooter scooter = scooterRepository.findById(scooterRentTermsDto.getId())
                 .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()));
@@ -100,10 +102,13 @@ public class ScooterService implements IScooterService {
     }
 
     @Override
-    public List<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size) {
-        return scooterRepository.findAllByScooterModelId(scooterModelId, PageRequest.of(page, size)).stream()
+    public Page<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size) {
+        Page<Scooter> scooters = scooterRepository.findAllByScooterModelId(scooterModelId, PageRequest.of(page, size));
+        List<ScooterWithoutHistoriesDto> scootersDto = scooters.getContent().stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(scootersDto, PageRequest.of(page, size), scooters.getTotalElements());
     }
 
 }

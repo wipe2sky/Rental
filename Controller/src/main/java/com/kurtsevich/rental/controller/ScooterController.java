@@ -5,12 +5,14 @@ import com.kurtsevich.rental.dto.scooter.AddScooterDto;
 import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/scooters")
@@ -27,14 +28,14 @@ import java.util.List;
 public class ScooterController {
     private final IScooterService scooterService;
 
-    @PutMapping
+    @PostMapping
     public ResponseEntity<Void> add(@RequestBody @Valid AddScooterDto addScooterDto) {
         scooterService.add(addScooterDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<ScooterWithoutHistoriesDto>> getAll(@RequestParam("page") int page,
+    public ResponseEntity<Page<ScooterWithoutHistoriesDto>> getAll(@RequestParam("page") int page,
                                                                    @RequestParam("size") int size) {
         return ResponseEntity.ok(scooterService.getAll(page, size));
     }
@@ -63,7 +64,7 @@ public class ScooterController {
     }
 
     @GetMapping("/models/{id}")
-    public ResponseEntity<List<ScooterWithoutHistoriesDto>> findAllByModelId(@PathVariable Long id,
+    public ResponseEntity<Page<ScooterWithoutHistoriesDto>> findAllByModelId(@PathVariable Long id,
                                                                              @RequestParam("page") int page,
                                                                              @RequestParam("size") int size) {
         return ResponseEntity.ok(scooterService.findAllScootersByModelId(id, page, size));

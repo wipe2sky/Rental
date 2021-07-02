@@ -14,7 +14,7 @@ public class PassportDto {
     private String passportNumber;
 
     @NotBlank(message = "identificationNumber must not be null")
-    @Pattern(regexp="([0-9]{7}[A-Z][0-9]{3}[A-Z]{2}[0-9])", message = "In identificationNumber use only uppercase english character and digits")
+    @Pattern(regexp="([0-9]{7}[A-Z][0-9]{3}[A-Z]{2}[0-9])", message = "In identificationNumber use only uppercase english character and digits. EXAMPLE: 1234567A123AB1")
     private String identificationNumber;
 
     @NotNull(message = "dateOfIssue must not be null")

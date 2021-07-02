@@ -1,6 +1,7 @@
 package com.kurtsevich.rental.service;
 
 import com.kurtsevich.rental.Status;
+import com.kurtsevich.rental.api.exception.NotFoundEntityException;
 import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.repository.ScooterRepository;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
@@ -42,11 +44,10 @@ class ScooterServiceTest {
     private AddScooterDto testAddScooterDto;
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto;
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto2;
-    private List<ScooterWithoutHistoriesDto> testScooterDtoList;
     private Page<Scooter> testScooterPage;
+    private Page<ScooterWithoutHistoriesDto> testScooterWithoutHistoriesDtoPage;
     private Scooter testScooter;
-    private List<Scooter> testScooterList;
-    private ScooterModel testScooterModel;
+    private Optional<ScooterModel> optionalTestScooterModel;
     @Mock
     private ScooterRepository scooterRepository;
     @Mock
@@ -63,14 +64,16 @@ class ScooterServiceTest {
                 .setScooterModelName("testModelName");
         testScooterWithoutHistoriesDto = new ScooterWithoutHistoriesDto();
         testScooterWithoutHistoriesDto2 = new ScooterWithoutHistoriesDto();
-        testScooterDtoList = Arrays.asList(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
+        List<ScooterWithoutHistoriesDto> testScooterDtoList = Arrays.asList(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
         RentTerms testRentTerms = new RentTerms()
                 .setName("testRentTerms")
                 .setPrice(new BigDecimal(2));
-        testScooterModel = new ScooterModel()
+        testScooterWithoutHistoriesDtoPage = new PageImpl<>(testScooterDtoList, PageRequest.of(0, 2), 2);
+        ScooterModel testScooterModel = new ScooterModel()
                 .setModel("testModel")
                 .setName("testModelName")
                 .setStatus(Status.ACTIVE);
+        optionalTestScooterModel = Optional.of(testScooterModel);
         testScooter = new Scooter()
                 .setStatus(Status.ACTIVE)
                 .setScooterModel(testScooterModel)
@@ -79,33 +82,31 @@ class ScooterServiceTest {
                 .setStatus(Status.ACTIVE)
                 .setScooterModel(testScooterModel)
                 .setRentTerms(testRentTerms);
-        testScooterList = Arrays.asList(testScooter, testScooter2);
-        testScooterPage = new PageImpl<>(testScooterList);
+        List<Scooter> testScooterList = Arrays.asList(testScooter, testScooter2);
+        testScooterPage = new PageImpl<>(testScooterList, PageRequest.of(0, 2), 2);
     }
 
     @Test
     void addScooterTest() {
         when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
-        when(scooterModelRepository.findByModel(anyString())).thenReturn(testScooterModel);
+        when(scooterModelRepository.findByModel(anyString())).thenReturn(optionalTestScooterModel);
 
         scooterService.add(testAddScooterDto);
 
-        verify(scooterRepository, times(1)).saveAndFlush(testScooter);
+        verify(scooterRepository, times(1)).save(testScooter);
     }
 
     @Test
     void addScooterModelIsNullExceptionTest() {
         when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
-        when(scooterModelRepository.findByModel(anyString())).thenReturn(null);
-
-        assertThrows(ServiceException.class, () -> scooterService.add(testAddScooterDto));
+        assertThrows(NotFoundEntityException.class, () -> scooterService.add(testAddScooterDto));
     }
 
     @Test
     void addScooterModelStatusIsNotActiveExceptionTest() {
         when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
-        when(scooterModelRepository.findByModel(anyString())).thenReturn(testScooterModel.setStatus(Status.NOT_ACTIVE));
-
+        when(scooterModelRepository.findByModel(anyString())).thenReturn(optionalTestScooterModel);
+        optionalTestScooterModel.get().setStatus(Status.NOT_ACTIVE);
         assertThrows(ServiceException.class, () -> scooterService.add(testAddScooterDto));
     }
 
@@ -114,7 +115,7 @@ class ScooterServiceTest {
         when(scooterRepository.findAll(any(Pageable.class))).thenReturn(testScooterPage);
         when(scooterMapper.scooterToScooterWithoutHistoriesDto(any(Scooter.class)))
                 .thenReturn(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
-        assertEquals(testScooterDtoList, scooterService.getAll(1, 1));
+        assertEquals(testScooterWithoutHistoriesDtoPage, scooterService.getAll(0, 2));
     }
 
     @Test
@@ -132,9 +133,9 @@ class ScooterServiceTest {
 
     @Test
     void findAllScootersByModelIdTest() {
-        when(scooterRepository.findAllByScooterModelId(anyLong(), any(Pageable.class))).thenReturn(testScooterList);
+        when(scooterRepository.findAllByScooterModelId(anyLong(), any(Pageable.class))).thenReturn(testScooterPage);
         when(scooterMapper.scooterToScooterWithoutHistoriesDto(any(Scooter.class)))
                 .thenReturn(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
-        assertEquals(testScooterDtoList, scooterService.findAllScootersByModelId(1L, 1, 1));
+        assertEquals(testScooterWithoutHistoriesDtoPage, scooterService.findAllScootersByModelId(1L, 0, 2));
     }
 }
