@@ -1,14 +1,17 @@
 package com.kurtsevich.rental.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "passport")
 public class Passport extends BaseEntity {
     @Column(name = "passport_number", nullable = false, unique = true)
@@ -23,4 +26,17 @@ public class Passport extends BaseEntity {
     @Column(name = "date_of_expire", nullable = false)
     private LocalDate dateOfExpire;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Passport)) return false;
+        if (!super.equals(o)) return false;
+        Passport passport = (Passport) o;
+        return Objects.equals(passportNumber, passport.passportNumber) && Objects.equals(identificationNumber, passport.identificationNumber) && Objects.equals(dateOfIssue, passport.dateOfIssue) && Objects.equals(dateOfExpire, passport.dateOfExpire);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(passportNumber, identificationNumber, dateOfIssue, dateOfExpire);
+    }
 }

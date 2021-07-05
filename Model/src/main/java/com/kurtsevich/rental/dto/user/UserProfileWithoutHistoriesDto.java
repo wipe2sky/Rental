@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.dto.passport.PassportDto;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class UserProfileWithoutHistoriesDto {
     @Pattern(regexp="([0-9]{12})", message = "Use only digits, size 12")
     private String phoneNumber;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private PassportDto passport;
 
     @NotNull(message = "discount must not be null")

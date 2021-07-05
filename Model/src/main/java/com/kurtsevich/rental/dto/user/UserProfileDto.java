@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.dto.passport.PassportDto;
 import com.kurtsevich.rental.dto.history.HistoryWithoutUserProfileDto;
@@ -41,6 +42,7 @@ public class UserProfileDto {
     @NotNull(message = "prepayments must not be null")
     private BigDecimal prepayments;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<HistoryWithoutUserProfileDto> histories;
 
 }

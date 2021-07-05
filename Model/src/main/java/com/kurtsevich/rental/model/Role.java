@@ -1,6 +1,7 @@
 package com.kurtsevich.rental.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,9 +15,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @ToString(exclude = "users")
 @Table(name = "role")
 public class Role extends BaseEntity {
@@ -38,4 +41,18 @@ public class Role extends BaseEntity {
             inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
     private List<User> users;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Role)) return false;
+        if (!super.equals(o)) return false;
+        Role role = (Role) o;
+        return Objects.equals(created, role.created) && Objects.equals(name, role.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(created, name);
+    }
 }

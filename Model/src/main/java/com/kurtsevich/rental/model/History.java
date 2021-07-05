@@ -1,6 +1,7 @@
 package com.kurtsevich.rental.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
@@ -11,9 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "history")
 public class History extends BaseEntity {
     @CreationTimestamp
@@ -42,4 +45,18 @@ public class History extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile", nullable = false)
     private UserProfile userProfile;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof History)) return false;
+        if (!super.equals(o)) return false;
+        History history = (History) o;
+        return Objects.equals(created, history.created);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), created);
+    }
 }

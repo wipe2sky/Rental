@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,8 +34,17 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
                 .setMessage(ex.getLocalizedMessage()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    @ExceptionHandler(AuthenticationException.class)
     private ResponseEntity<ExceptionDto> handleAuthenticationException(AuthenticationException ex) {
+        log.error(Arrays.toString(ex.getStackTrace()));
+        return new ResponseEntity<>(new ExceptionDto()
+                .setException(ex.getClass().getSimpleName())
+                .setMessage(ex.getLocalizedMessage())
+                , HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    private ResponseEntity<ExceptionDto> handleAccessDeniedException(AccessDeniedException ex) {
         log.error(Arrays.toString(ex.getStackTrace()));
         return new ResponseEntity<>(new ExceptionDto()
                 .setException(ex.getClass().getSimpleName())

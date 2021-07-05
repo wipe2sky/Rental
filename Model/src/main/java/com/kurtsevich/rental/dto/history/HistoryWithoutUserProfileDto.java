@@ -20,7 +20,7 @@ public class HistoryWithoutUserProfileDto {
 
     private BigDecimal actualDiscount;
 
-    private Boolean isActual;
+    private boolean isActual;
 
     @NotNull(message = "scooter must not be null")
     private ScooterWithoutHistoriesDto scooter;

@@ -1,7 +1,8 @@
 package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +12,11 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "rental_point")
 public class RentalPoint extends BaseEntity {
     @Column(name = "name", nullable = false, unique = true)
@@ -50,4 +53,17 @@ public class RentalPoint extends BaseEntity {
     @OneToMany(mappedBy = "rentalPoint", fetch = FetchType.LAZY)
     private List<Scooter> scooters;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RentalPoint)) return false;
+        if (!super.equals(o)) return false;
+        RentalPoint that = (RentalPoint) o;
+        return streetAddressNumber == that.streetAddressNumber && streetAddressNumberSuffix == that.streetAddressNumberSuffix && Double.compare(that.longitude, longitude) == 0 && Double.compare(that.latitude, latitude) == 0 && Objects.equals(name, that.name) && Objects.equals(city, that.city) && Objects.equals(streetName, that.streetName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, city, streetName, streetAddressNumber, streetAddressNumberSuffix, longitude, latitude);
+    }
 }

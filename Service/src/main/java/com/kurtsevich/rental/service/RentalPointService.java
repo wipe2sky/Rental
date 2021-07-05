@@ -60,7 +60,10 @@ public class RentalPointService implements IRentalPointService {
         List<RentalPointDto> rentalPointsDto = rentalPoints.getContent().stream()
                 .map(rentalPointMapper::rentalPointToRentalPointDto)
                 .collect(Collectors.toList());
-
+        if (rentalPointsDto.isEmpty()) {
+            log.warn("IN ScooterService:getAll - Request page number greater than available");
+            throw new ServiceException("Request page number greater than available");
+        }
         return new PageImpl<>(rentalPointsDto, PageRequest.of(page, size), rentalPoints.getTotalElements());
     }
 

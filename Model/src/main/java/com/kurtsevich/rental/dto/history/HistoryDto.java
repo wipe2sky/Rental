@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.dto.history;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.dto.user.UserProfileWithoutHistoriesDto;
 import lombok.Data;
@@ -25,11 +26,13 @@ public class HistoryDto {
 
     private BigDecimal actualDiscount;
 
-    private Boolean isActual;
+    private boolean isActual;
 
     @NotNull(message = "scooter must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private ScooterWithoutHistoriesDto scooter;
 
     @NotNull(message = "userProfile must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UserProfileWithoutHistoriesDto userProfile;
 }

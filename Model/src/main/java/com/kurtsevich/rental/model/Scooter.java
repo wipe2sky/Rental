@@ -1,7 +1,8 @@
 package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,9 +18,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "scooter")
 public class Scooter extends BaseEntity {
     @Enumerated(EnumType.STRING)
@@ -56,4 +59,18 @@ public class Scooter extends BaseEntity {
     @ToString.Exclude
     @OneToMany(mappedBy = "scooter", fetch = FetchType.LAZY)
     private List<History> histories;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Scooter)) return false;
+        if (!super.equals(o)) return false;
+        Scooter scooter = (Scooter) o;
+        return Objects.equals(created, scooter.created) && Objects.equals(scooterModel, scooter.scooterModel);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), created, scooterModel);
+    }
 }

@@ -53,13 +53,19 @@ public class ScooterService implements IScooterService {
     @Override
     public Page<ScooterWithoutHistoriesDto> getAll(int page, int size) {
         Page<Scooter> scooters = scooterRepository.findAll(PageRequest.of(page, size));
+        if (scooters.getTotalPages() <= page) {
+            log.warn("IN ScooterService:getAll - Request page number greater than available");
+            throw new NotFoundEntityException("Request page number greater than available");
+        }
+
         List<ScooterWithoutHistoriesDto> scooterDtoList = scooters.getContent().stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());
         if (scooterDtoList.isEmpty()) {
-            log.warn("IN ScooterService:getAll - Request page number greater than available");
-            throw new ServiceException("Request page number greater than available");
+            log.warn("IN ScooterService:getAll - not found");
+            throw new NotFoundEntityException("scooters");
         }
+
         return new PageImpl<>(scooterDtoList, PageRequest.of(page, size), scooters.getTotalElements());
     }
 

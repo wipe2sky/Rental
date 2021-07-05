@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.dto.scooter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.dto.rent_terms.RentTermsDto;
 import com.kurtsevich.rental.dto.history.HistoryDto;
@@ -27,9 +28,12 @@ public class ScooterWithoutRentalPointDto {
     private LocalDateTime updated;
 
     @NotNull(message = "scooterModel must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private ScooterModelDto scooterModel;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private RentTermsDto rentTerms;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<HistoryDto> histories;
 }

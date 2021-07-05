@@ -1,5 +1,6 @@
 package com.kurtsevich.rental.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class UserDto {
     private String username;
 
     @NotBlank(message = "password must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotNull(message = "userProfile must not be null")

@@ -1,7 +1,8 @@
 package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,9 +10,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "scooter_model")
 public class ScooterModel extends BaseEntity {
 
@@ -37,5 +40,17 @@ public class ScooterModel extends BaseEntity {
     @Column(name = "power", nullable = false)
     private int power;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ScooterModel)) return false;
+        if (!super.equals(o)) return false;
+        ScooterModel that = (ScooterModel) o;
+        return maxSpeed == that.maxSpeed && weightLimit == that.weightLimit && power == that.power && Objects.equals(model, that.model) && Objects.equals(weight, that.weight);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, maxSpeed, weight, weightLimit, power);
+    }
 }

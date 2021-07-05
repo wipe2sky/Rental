@@ -1,7 +1,8 @@
 package com.kurtsevich.rental.model;
 
 import com.kurtsevich.rental.Status;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,9 +19,11 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)
@@ -61,4 +64,18 @@ public class UserProfile extends BaseEntity {
     @ToString.Exclude
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY)
     private List<History> histories;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserProfile)) return false;
+        if (!super.equals(o)) return false;
+        UserProfile that = (UserProfile) o;
+        return Objects.equals(created, that.created) && Objects.equals(user, that.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), created);
+    }
 }
