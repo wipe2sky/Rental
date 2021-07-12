@@ -1,19 +1,17 @@
 package com.kurtsevich.rental.api.service;
 
-import com.kurtsevich.rental.dto.passport.EditPassportDto;
+import com.kurtsevich.rental.dto.passport.UpdatePassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.SetDiscountDto;
 import com.kurtsevich.rental.dto.user.UserDto;
-import com.kurtsevich.rental.dto.user.UserRoleDto;
-import com.kurtsevich.rental.dto.user.UserStatusDto;
 import com.kurtsevich.rental.model.User;
 import org.springframework.data.domain.Page;
 
 public interface IUserService {
-    void register(CreateUserDto createUserDto);
+    User register(CreateUserDto createUserDto);
 
     Page<UserDto> getAll(int page, int size);
 
@@ -21,11 +19,11 @@ public interface IUserService {
 
     void delete(Long id);
 
-    void addUserRole(UserRoleDto userRoleDto);
+    void addUserRole(Long userId, Long roleId);
 
-    void changeUserStatus(UserStatusDto userStatusDto);
+    void changeUserStatusOrDiscount(Long id, UpdateUserProfileDto updateUserProfileDto);
 
-    void deleteUserRole(UserRoleDto userRoleDto);
+    void deleteUserRole(Long userId, Long roleId);
 
     User findByUsername(String username);
 
@@ -33,9 +31,9 @@ public interface IUserService {
 
     void changeUserPassword(ChangeUserPasswordDto changeUserPasswordDto);
 
-    void editUserProfile(EditUserProfileDto editUserProfileDto);
+    void updateUserProfile(UpdateUserProfileDto updateUserProfileDto);
 
-    void editPassport(EditPassportDto editPassportDto);
+    void updatePassport(UpdatePassportDto updatePassportDto);
 
     Long addPrepayments(AddPrepaymentsDto addPrepaymentsDto);
 

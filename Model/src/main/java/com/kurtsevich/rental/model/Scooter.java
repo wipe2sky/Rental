@@ -30,7 +30,7 @@ public class Scooter extends BaseEntity {
     private Status status;
 
     @Column(name = "charge", nullable = false)
-    private int charge;
+    private Integer charge;
 
     @Column(name = "mileage", nullable = false)
     private Long mileage;

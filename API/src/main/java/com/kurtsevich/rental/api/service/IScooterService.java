@@ -1,12 +1,12 @@
 package com.kurtsevich.rental.api.service;
 
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
+import com.kurtsevich.rental.model.Scooter;
 import org.springframework.data.domain.Page;
 
 public interface IScooterService {
-    void add(AddScooterDto addScooterDto);
+    Scooter add(AddScooterDto addScooterDto);
 
     Page<ScooterWithoutHistoriesDto> getAll(int page, int size);
 
@@ -14,9 +14,9 @@ public interface IScooterService {
 
     void delete(Long id);
 
-    void addRentTermsToScooter(ScooterRentTermsDto scooterRentTermsDto);
+    void addRentTermsToScooter(Long scooterId, Long termsId);
 
-    void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto);
+    void deleteRentTermsFromScooter(Long scooterId);
 
     Page<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size);
 }

@@ -4,13 +4,12 @@ import com.kurtsevich.rental.api.service.IRoleService;
 import com.kurtsevich.rental.api.service.IUserService;
 import com.kurtsevich.rental.dto.authentication.RoleWithoutUsersDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.user.SetDiscountDto;
+import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
-import com.kurtsevich.rental.dto.user.UserRoleDto;
-import com.kurtsevich.rental.dto.user.UserStatusDto;
+import com.kurtsevich.rental.model.Role;
+import com.kurtsevich.rental.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -45,8 +45,8 @@ public class RootController {
 
     @PostMapping("/users")
     public ResponseEntity<Void> addUser(@RequestBody @Valid CreateUserDto createUserDto) {
-        userService.register(createUserDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        User user = userService.register(createUserDto);
+        return ResponseEntity.created(URI.create(String.format("/admin/users/%d", user.getId()))).build();
     }
 
     @DeleteMapping("/users/{id}")
@@ -55,16 +55,24 @@ public class RootController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/users/roles")
-    public ResponseEntity<Void> addUserRole(@RequestBody @Valid UserRoleDto userRoleDto) {
-        userService.addUserRole(userRoleDto);
+    @PutMapping("/users/{userId}/roles/{roleId}")
+    public ResponseEntity<Void> addUserRole(@PathVariable Long userId,
+                                            @PathVariable Long roleId) {
+        userService.addUserRole(userId, roleId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/users/{userId}/roles/{roleId}")
+    public ResponseEntity<Void> deleteUserRole(@PathVariable Long userId,
+                                               @PathVariable Long roleId) {
+        userService.deleteUserRole(userId, roleId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/roles")
     public ResponseEntity<Void> addRole(@RequestBody @Valid RoleWithoutUsersDto roleWithoutUsersDto) {
-        roleService.add(roleWithoutUsersDto);
-        return ResponseEntity.noContent().build();
+        Role role = roleService.add(roleWithoutUsersDto);
+        return ResponseEntity.created(URI.create(String.format("/admin/roles/%d", role.getId()))).build();
     }
 
     @DeleteMapping("/roles/{id}")
@@ -73,27 +81,16 @@ public class RootController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/users/status")
-    public ResponseEntity<Void> changeUserStatus(@RequestBody @Valid UserStatusDto userStatusDto) {
-        userService.changeUserStatus(userStatusDto);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/users/discounts")
-    public ResponseEntity<Void> setDiscount(@RequestBody @Valid SetDiscountDto setDiscountDto) {
-        userService.setDiscount(setDiscountDto);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<Void> updateUserProfile(@PathVariable Long id,
+                                                  @RequestBody UpdateUserProfileDto updateUserProfileDto) {
+        userService.changeUserStatusOrDiscount(id, updateUserProfileDto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users/{id}/roles")
     public ResponseEntity<List<RoleWithoutUsersDto>> getUserRole(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id).getRoles());
 
-    }
-
-    @DeleteMapping("/users/roles")
-    public ResponseEntity<Void> deleteUserRole(@RequestBody @Valid UserRoleDto userRoleDto) {
-        userService.deleteUserRole(userRoleDto);
-        return ResponseEntity.noContent().build();
     }
 }

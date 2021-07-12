@@ -33,7 +33,7 @@ public class History extends BaseEntity {
     private Long distance;
 
     @Column(name = "actual_discount")
-    private int actualDiscount;
+    private Integer actualDiscount;
 
     @Column(name = "is_actual", nullable = false)
     private boolean isActual;

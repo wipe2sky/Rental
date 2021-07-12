@@ -9,9 +9,8 @@ import com.kurtsevich.rental.api.repository.UserProfileRepository;
 import com.kurtsevich.rental.api.repository.UserRepository;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
+import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
-import com.kurtsevich.rental.dto.user.UserRoleDto;
-import com.kurtsevich.rental.dto.user.UserStatusDto;
 import com.kurtsevich.rental.model.Passport;
 import com.kurtsevich.rental.model.Role;
 import com.kurtsevich.rental.model.User;
@@ -51,14 +50,11 @@ class UserServiceTest {
     private final String ENCODE_TEST_USER_PASSWORD = "$2a$10$vtHiPqVPyngypcR2MYsMPuOxlCkqc37b6";
     private CreateUserDto testCreateUserDto;
     private User testUser;
-    private Optional<User> optionalTestUser;
     private Page<User> testUserPage;
     private UserDto testUserDto;
     private UserDto testUserDto2;
-    private List<UserDto> testUserDtoList;
     private Page<UserDto> testUserDtoPage;
     private Role testRole;
-    private Optional<Role> optionalTestRole;
     private Passport testPassport;
     private UserProfile testUserProfile;
     @InjectMocks
@@ -75,9 +71,12 @@ class UserServiceTest {
     private UserMapper userMapper;
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
+    @Mock
+    private CheckEntity checkEntity;
+
 
     @BeforeEach
-    private void init() {
+    void init() {
         testCreateUserDto = new CreateUserDto()
                 .setUsername("testUser2")
                 .setPassword("test")
@@ -99,7 +98,6 @@ class UserServiceTest {
                 .setPassword(ENCODE_TEST_USER_PASSWORD);
 
         List<User> testUserList = Arrays.asList(testUser, testUser2);
-        optionalTestUser = Optional.ofNullable(testUser);
 
         testUserPage = new PageImpl<>(testUserList, PageRequest.of(0, 2), 2);
 
@@ -109,7 +107,7 @@ class UserServiceTest {
         testUserDto2 = new UserDto()
                 .setUsername("testUser2")
                 .setPassword(ENCODE_TEST_USER_PASSWORD);
-        testUserDtoList = Arrays.asList(testUserDto, testUserDto2);
+        List<UserDto> testUserDtoList = Arrays.asList(testUserDto, testUserDto2);
         testUserDtoPage = new PageImpl<>(testUserDtoList, PageRequest.of(0, 2), 2);
 
         testUserProfile = new UserProfile()
@@ -121,8 +119,6 @@ class UserServiceTest {
                 .setName("ROLE_USER")
                 .setCreated(LocalDateTime.now())
                 .setUpdated(LocalDateTime.now());
-
-        optionalTestRole = Optional.ofNullable(testRole);
 
         testPassport = new Passport()
                 .setPassportNumber("MP4678344")
@@ -136,7 +132,7 @@ class UserServiceTest {
 
         when(userMapper.createdUserDtoToUser(testCreateUserDto)).thenReturn(testUser);
         when(passwordEncoder.encode(testCreateUserDto.getPassword())).thenReturn(ENCODE_TEST_USER_PASSWORD);
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(optionalTestRole);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(testRole));
         when(userMapper.createdUserDtoToPassport(testCreateUserDto)).thenReturn(testPassport);
         when(userMapper.createdUserDtoToUserProfile(testCreateUserDto)).thenReturn(testUserProfile);
 
@@ -175,8 +171,7 @@ class UserServiceTest {
     @Test
     void sameUserStatusExceptionTest() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser.setUserProfile(testUserProfile)));
-        assertThrows(ServiceException.class, () -> userService.changeUserStatus(new UserStatusDto()
-                .setUserId(1L)
+        assertThrows(ServiceException.class, () -> userService.changeUserStatusOrDiscount(1L, new UpdateUserProfileDto()
                 .setStatus(Status.ACTIVE)));
     }
 
@@ -185,15 +180,13 @@ class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser.setRoles(new ArrayList<>())));
         when(roleRepository.findById(anyLong())).thenReturn(Optional.of(testRole));
 
-        assertThrows(ServiceException.class, () -> userService.deleteUserRole(new UserRoleDto()
-                .setRoleId(1L)
-                .setUserId(1L)));
+        assertThrows(ServiceException.class, () -> userService.deleteUserRole(1L, 1L));
     }
 
     @Test
     void changeUserPasswordExceptionSamePasswordTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
-        optionalTestUser.get().setUserProfile(testUserProfile);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        testUser.setUserProfile(testUserProfile);
         assertThrows(AuthenticationServiceException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")
@@ -203,8 +196,8 @@ class UserServiceTest {
 
     @Test
     void changeUserPasswordExceptionIncorrectPasswordTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
-        optionalTestUser.get().setUserProfile(testUserProfile);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        testUser.setUserProfile(testUserProfile);
         assertThrows(AuthenticationServiceException.class, () ->
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")
@@ -218,15 +211,4 @@ class UserServiceTest {
                 userService.changeUserPassword(new ChangeUserPasswordDto()
                         .setUsername("anyName")));
     }
-
-    @Test
-    void changeUserPasswordExceptionUserIsNotActualStatusTest() {
-        when(userRepository.findByUsername(anyString())).thenReturn(optionalTestUser);
-        optionalTestUser.get().setUserProfile(testUserProfile.setStatus(Status.NOT_ACTIVE));
-        assertThrows(ServiceException.class, () ->
-                userService.changeUserPassword(new ChangeUserPasswordDto()
-                        .setUsername("anyName")));
-    }
-
-
 }

@@ -29,10 +29,11 @@ public class ScooterModelService implements IScooterModelService {
 
     @Override
     @Transactional
-    public void add(ScooterModelDto scooterModelDto) {
+    public ScooterModel add(ScooterModelDto scooterModelDto) {
         ScooterModel scooterModel = mapper.scooterModelDtoToScooterModel(scooterModelDto);
         scooterModelRepository.save(scooterModel);
         log.info("IN ScooterModelService:add - scooterModel {} created", scooterModel);
+        return scooterModel;
     }
 
     @Override

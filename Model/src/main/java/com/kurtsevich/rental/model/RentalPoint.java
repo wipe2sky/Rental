@@ -36,10 +36,10 @@ public class RentalPoint extends BaseEntity {
     private String streetType;
 
     @Column(name = "street_number", nullable = false)
-    private int streetAddressNumber;
+    private Integer streetAddressNumber;
 
     @Column(name = "street_number_suffix")
-    private char streetAddressNumberSuffix;
+    private Character streetAddressNumberSuffix;
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;

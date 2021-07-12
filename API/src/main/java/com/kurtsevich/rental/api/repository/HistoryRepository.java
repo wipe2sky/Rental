@@ -23,6 +23,8 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
 
     Page<History> findAllByScooterId(Long id, Pageable page);
 
+    Page<History> findAllByIsActualIsTrue(Pageable page);
+
     @Query(value = "SELECT h FROM History h WHERE h.created > ?1 and h.created < ?2 ORDER BY h.created")
     Page<History> findAllByDate(LocalDateTime startDate, LocalDateTime finishedDate, Pageable page);
 }

@@ -21,10 +21,11 @@ public class RoleService implements IRoleService {
     private final RoleMapper roleMapper;
 
     @Override
-    public void add(RoleWithoutUsersDto roleWithoutUsersDto) {
+    public Role add(RoleWithoutUsersDto roleWithoutUsersDto) {
         Role role = roleMapper.roleWithoutUsersDtoToRole(roleWithoutUsersDto);
         roleRepository.save(role);
         log.info("IN RoleService:add - role {} created", role);
+        return role;
     }
 
     @Override

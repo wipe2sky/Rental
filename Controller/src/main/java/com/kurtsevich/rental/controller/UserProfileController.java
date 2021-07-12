@@ -1,14 +1,14 @@
 package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IUserService;
-import com.kurtsevich.rental.dto.passport.EditPassportDto;
+import com.kurtsevich.rental.dto.passport.UpdatePassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.user.EditUserProfileDto;
+import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
+import com.kurtsevich.rental.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/users")
@@ -28,37 +29,37 @@ import javax.validation.Valid;
 public class UserProfileController {
     private final IUserService userService;
 
-    @GetMapping
+    @PostMapping
+    public ResponseEntity<Void> registration(@RequestBody @Valid CreateUserDto createUserDto) {
+        User user = userService.register(createUserDto);
+        return ResponseEntity.created(URI.create(String.format("/users/%d", user.getId()))).build();
+    }
+
+    @GetMapping("/profile")
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     public ResponseEntity<UserDto> getProfile(@RequestParam("username") String username) {
         return ResponseEntity.ok(userService.findProfileByUsername(username));
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> registration(@RequestBody @Valid CreateUserDto createUserDto) {
-        userService.register(createUserDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping("/passwords")
     @PreAuthorize("#changeUserPasswordDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
         userService.changeUserPassword(changeUserPasswordDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/profiles")
-    @PreAuthorize("#editUserProfileDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> editUserProfile(@RequestBody @Valid EditUserProfileDto editUserProfileDto) {
-        userService.editUserProfile(editUserProfileDto);
-        return ResponseEntity.noContent().build();
+    @PreAuthorize("#updateUserProfileDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
+    public ResponseEntity<Void> updateUserProfile(@RequestBody @Valid UpdateUserProfileDto updateUserProfileDto) {
+        userService.updateUserProfile(updateUserProfileDto);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/passports")
-    @PreAuthorize("#editPassportDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
-    public ResponseEntity<Void> editPassport(@RequestBody @Valid EditPassportDto editPassportDto) {
-        userService.editPassport(editPassportDto);
-        return ResponseEntity.noContent().build();
+    @PreAuthorize("#updatePassportDto.username == authentication.principal.username or hasRole('ADMIN') or hasRole('WORKER')")
+    public ResponseEntity<Void> updatePassport(@RequestBody @Valid UpdatePassportDto updatePassportDto) {
+        userService.updatePassport(updatePassportDto);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/prepayments")

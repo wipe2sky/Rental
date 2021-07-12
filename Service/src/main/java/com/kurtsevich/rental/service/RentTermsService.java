@@ -28,10 +28,11 @@ public class RentTermsService implements IRentTermsService {
 
     @Override
     @Transactional
-    public void add(RentTermsDto rentTermsDto) {
+    public RentTerms add(RentTermsDto rentTermsDto) {
         RentTerms rentTerms = rentTermsMapper.rentTermsDtoToRentTerms(rentTermsDto);
         rentTermsRepository.save(rentTerms);
         log.info("IN RentTermsService:add - Rent term {} added successfully", rentTerms);
+        return rentTerms;
     }
 
     @Override
@@ -59,20 +60,17 @@ public class RentTermsService implements IRentTermsService {
     }
 
     @Override
-    public Page<RentTermsDto> getAll(int page, int size) {
-        Page<RentTerms> rentTerms = rentTermsRepository.findAll(PageRequest.of(page, size));
+    public Page<RentTermsDto> getAll(int page, int size, String sortVar) {
+        Page<RentTerms> rentTerms = sortVar != null
+                ? rentTermsRepository.findAll(PageRequest.of(page, size, Sort.by(sortVar)))
+                : rentTermsRepository.findAll(PageRequest.of(page, size));
         List<RentTermsDto> rentTermsDto = rentTerms.getContent().stream()
                 .map(rentTermsMapper::rentTermsToRentTermsDto)
                 .collect(Collectors.toList());
-        return new PageImpl<>(rentTermsDto, PageRequest.of(page, size), rentTerms.getTotalElements());
-    }
-
-    @Override
-    public Page<RentTermsDto> getSortBy(int page, int size, String sortVar) {
-        Page<RentTerms> rentTerms = rentTermsRepository.findAll(PageRequest.of(page, size, Sort.by(sortVar)));
-        List<RentTermsDto> rentTermsDto = rentTerms.getContent().stream()
-                .map(rentTermsMapper::rentTermsToRentTermsDto)
-                .collect(Collectors.toList());
+        if (rentTermsDto.isEmpty()) {
+            log.warn("IN RentTermsService:getAll - not found");
+            throw new NotFoundEntityException("rentTerms");
+        }
         return new PageImpl<>(rentTermsDto, PageRequest.of(page, size), rentTerms.getTotalElements());
     }
 }

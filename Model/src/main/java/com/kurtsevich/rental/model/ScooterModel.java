@@ -35,10 +35,10 @@ public class ScooterModel extends BaseEntity {
     private BigDecimal weight;
 
     @Column(name = "weight_limit", nullable = false)
-    private int weightLimit;
+    private Integer weightLimit;
 
     @Column(name = "power", nullable = false)
-    private int power;
+    private Integer power;
 
     @Override
     public boolean equals(Object o) {

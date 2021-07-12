@@ -41,16 +41,17 @@ public class HistoryService implements IHistoryService {
     private final ScooterRepository scooterRepository;
     private final HistoryRepository historyRepository;
     private final HistoryMapper historyMapper;
+    private final CheckEntity checkEntity;
 
     @Override
     @Transactional
-    public void createHistory(UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
+    public History createHistory(UserProfileScooterAndPriceDto userProfileScooterAndPriceDto) {
         UserProfile userProfile = userProfileRepository.findById(userProfileScooterAndPriceDto.getUserProfileId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getUserProfileId()));
         Scooter scooter = scooterRepository.findById(userProfileScooterAndPriceDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getScooterId()));
 
-        validateUserProfileAndScooterAndRentalPointIsActive(userProfile, scooter, "createHistory");
+        checkEntity.checkIsActive(userProfile.getStatus(), scooter.getStatus(), scooter.getRentalPoint().getStatus());
 
         if (scooter.getRentTerms() == null) {
             log.warn("IN HistoryService:createHistory - scooter with id {} not have a role", scooter.getId());
@@ -68,21 +69,7 @@ public class HistoryService implements IHistoryService {
         historyRepository.save(history);
 
         log.info("IN HistoryService:createHistory - history successfully created");
-    }
-
-    private void validateUserProfileAndScooterAndRentalPointIsActive(UserProfile userProfile, Scooter scooter, String method) {
-        if (!Status.ACTIVE.equals(userProfile.getStatus())) {
-            log.warn("IN HistoryService:{} - user: {} not active", method, userProfile.getUser().getUsername());
-            throw new ServiceException("User is not active");
-        }
-        if (!Status.ACTIVE.equals(scooter.getStatus())) {
-            log.warn("IN HistoryService:{} - scooter with id {} is not active", method, scooter.getId());
-            throw new ServiceException("Scooter is not active");
-        }
-        if (!Status.ACTIVE.equals(scooter.getRentalPoint().getStatus())) {
-            log.warn("IN HistoryService:{} - rental points with id {} is not active", method, scooter.getRentalPoint().getId());
-            throw new ServiceException("Rental Point is " + scooter.getRentalPoint().getStatus());
-        }
+        return history;
     }
 
     @Override
@@ -214,5 +201,31 @@ public class HistoryService implements IHistoryService {
             throw new NotFoundEntityException(" histories at current dates");
         }
         return new PageImpl<>(historyDtoList, PageRequest.of(page, size), histories.getTotalElements());
+    }
+
+    @Override
+    public Page<HistoryDto> findAllActualHistories(int page, int size) {
+        Page<History> historiesPage = historyRepository.findAllByIsActualIsTrue(PageRequest.of(page, size));
+        List<HistoryDto> historyDtoList = historiesPage.getContent().stream()
+                .map(historyMapper::historyToHistoryDto)
+                .collect(Collectors.toList());
+
+        if (historyDtoList.isEmpty()) {
+            throw new NotFoundEntityException(" actual histories");
+        }
+        return new PageImpl<>(historyDtoList, PageRequest.of(page, size), historiesPage.getTotalElements());
+    }
+
+    @Override
+    public Page<HistoryDto> findAllHistoryBy(String username, Boolean actual, Long scooterId, String startDate, String endDate, int page, int size) {
+        if (username != null) {
+            return findAllHistoryByUsername(username, page, size);
+        } else if (actual != null) {
+            return findAllActualHistories(page, size);
+        } else if (scooterId != null) {
+            return findByScooterId(scooterId, page, size);
+        } else if (startDate != null) {
+            return findByDate(page, size, startDate, endDate);
+        } else throw new NotFoundEntityException(" histories");
     }
 }

@@ -2,13 +2,11 @@ package com.kurtsevich.rental.service;
 
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
-import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.RentTermsRepository;
 import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.repository.ScooterRepository;
 import com.kurtsevich.rental.api.service.IScooterService;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
 import com.kurtsevich.rental.model.Scooter;
 import com.kurtsevich.rental.model.ScooterModel;
@@ -32,22 +30,21 @@ public class ScooterService implements IScooterService {
     private final ScooterModelRepository scooterModelRepository;
     private final RentTermsRepository rentTermsRepository;
     private final ScooterMapper scooterMapper;
+    private final CheckEntity checkEntity;
 
     @Override
     @Transactional
-    public void add(AddScooterDto addScooterDto) {
+    public Scooter add(AddScooterDto addScooterDto) {
         Scooter scooter = scooterMapper.addScooterDtoToScooter(addScooterDto);
         ScooterModel scooterModel = scooterModelRepository.findByModel(addScooterDto.getScooterModelName())
                 .orElseThrow(() -> new NotFoundEntityException("scooter by model name " + addScooterDto.getScooterModelName()));
 
-        if (scooterModel.getStatus().equals(Status.ACTIVE)) {
-            scooter.setScooterModel(scooterModel);
-            scooterRepository.save(scooter);
-            log.info("IN ScooterService:add - scooter {} added", scooter);
-        } else {
-            throw new ServiceException("Scooter model not found or not active");
-        }
+        checkEntity.checkIsActive(scooterModel.getStatus());
 
+        scooter.setScooterModel(scooterModel);
+        scooterRepository.save(scooter);
+        log.info("IN ScooterService:add - scooter {} added", scooter);
+        return scooter;
     }
 
     @Override
@@ -87,24 +84,24 @@ public class ScooterService implements IScooterService {
 
     @Override
     @Transactional
-    public void addRentTermsToScooter(ScooterRentTermsDto scooterRentTermsDto) {
-        scooterRepository.findById(scooterRentTermsDto.getId())
-                .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()))
-                .setRentTerms(rentTermsRepository.findById(scooterRentTermsDto.getRentTermsId())
-                        .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getRentTermsId())));
+    public void addRentTermsToScooter(Long scooterId, Long termsId) {
+        scooterRepository.findById(scooterId)
+                .orElseThrow(() -> new NotFoundEntityException(scooterId))
+                .setRentTerms(rentTermsRepository.findById(termsId)
+                        .orElseThrow(() -> new NotFoundEntityException(termsId)));
         log.info("IN ScooterService:addRentTermsToScooter - rent terms with id {} added to scooter with id {}",
-                scooterRentTermsDto.getId(), scooterRentTermsDto.getRentTermsId());
+                scooterId, termsId);
 
     }
 
     @Override
     @Transactional
-    public void deleteRentTermsFromScooter(ScooterRentTermsDto scooterRentTermsDto) {
-        Scooter scooter = scooterRepository.findById(scooterRentTermsDto.getId())
-                .orElseThrow(() -> new NotFoundEntityException(scooterRentTermsDto.getId()));
+    public void deleteRentTermsFromScooter(Long scooterId) {
+        Scooter scooter = scooterRepository.findById(scooterId)
+                .orElseThrow(() -> new NotFoundEntityException(scooterId));
         scooter.setRentTerms(null);
-        log.info("IN ScooterService:deleteRentTermsAtScooter - rent terms with id {} deleted to scooter with id {}",
-                scooterRentTermsDto.getId(), scooterRentTermsDto.getRentTermsId());
+        log.info("IN ScooterService:deleteRentTermsAtScooter - rent terms deleted at scooter with id {}",
+                scooterId);
     }
 
     @Override

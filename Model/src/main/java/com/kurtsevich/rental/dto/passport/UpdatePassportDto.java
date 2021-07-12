@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Data
-public class EditPassportDto {
+public class UpdatePassportDto {
     @NotBlank(message = "username must not be null")
     private String username;
 

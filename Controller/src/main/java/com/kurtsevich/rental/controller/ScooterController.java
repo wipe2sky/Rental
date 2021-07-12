@@ -2,11 +2,10 @@ package com.kurtsevich.rental.controller;
 
 import com.kurtsevich.rental.api.service.IScooterService;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
-import com.kurtsevich.rental.dto.scooter.ScooterRentTermsDto;
 import com.kurtsevich.rental.dto.scooter.ScooterWithoutHistoriesDto;
+import com.kurtsevich.rental.model.Scooter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/scooters")
@@ -30,8 +30,8 @@ public class ScooterController {
 
     @PostMapping
     public ResponseEntity<Void> add(@RequestBody @Valid AddScooterDto addScooterDto) {
-        scooterService.add(addScooterDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Scooter scooter = scooterService.add(addScooterDto);
+        return ResponseEntity.created(URI.create(String.format("/scooters/%d", scooter.getId()))).build();
     }
 
     @GetMapping
@@ -51,15 +51,16 @@ public class ScooterController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/rent-terms")
-    public ResponseEntity<Void> addRentTermsToScooter(@RequestBody @Valid ScooterRentTermsDto scooterRentTermsDto) {
-        scooterService.addRentTermsToScooter(scooterRentTermsDto);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{scooterId}/rent-terms/{termsId}")
+    public ResponseEntity<Void> addRentTermsToScooter(@PathVariable Long scooterId,
+                                                      @PathVariable Long termsId) {
+        scooterService.addRentTermsToScooter(scooterId, termsId);
+        return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/rent-terms")
-    public ResponseEntity<Void> deleteRentTermsFromScooter(@RequestBody @Valid ScooterRentTermsDto scooterRentTermsDto) {
-        scooterService.deleteRentTermsFromScooter(scooterRentTermsDto);
+    @DeleteMapping("/{scooterId}/rent-terms")
+    public ResponseEntity<Void> deleteRentTermsFromScooter(@PathVariable Long scooterId) {
+        scooterService.deleteRentTermsFromScooter(scooterId);
         return ResponseEntity.noContent().build();
     }
 

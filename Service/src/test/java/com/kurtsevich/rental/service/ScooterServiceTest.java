@@ -2,7 +2,6 @@ package com.kurtsevich.rental.service;
 
 import com.kurtsevich.rental.Status;
 import com.kurtsevich.rental.api.exception.NotFoundEntityException;
-import com.kurtsevich.rental.api.exception.ServiceException;
 import com.kurtsevich.rental.api.repository.ScooterModelRepository;
 import com.kurtsevich.rental.api.repository.ScooterRepository;
 import com.kurtsevich.rental.dto.scooter.AddScooterDto;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,13 +45,15 @@ class ScooterServiceTest {
     private Page<Scooter> testScooterPage;
     private Page<ScooterWithoutHistoriesDto> testScooterWithoutHistoriesDtoPage;
     private Scooter testScooter;
-    private Optional<ScooterModel> optionalTestScooterModel;
+    private ScooterModel testScooterModel;
     @Mock
     private ScooterRepository scooterRepository;
     @Mock
     private ScooterModelRepository scooterModelRepository;
     @Mock
     private ScooterMapper scooterMapper;
+    @Mock
+    private CheckEntity checkEntity;
 
     @BeforeEach
     void init() {
@@ -69,11 +69,10 @@ class ScooterServiceTest {
                 .setName("testRentTerms")
                 .setPrice(new BigDecimal(2));
         testScooterWithoutHistoriesDtoPage = new PageImpl<>(testScooterDtoList, PageRequest.of(0, 2), 2);
-        ScooterModel testScooterModel = new ScooterModel()
+        testScooterModel = new ScooterModel()
                 .setModel("testModel")
                 .setName("testModelName")
                 .setStatus(Status.ACTIVE);
-        optionalTestScooterModel = Optional.of(testScooterModel);
         testScooter = new Scooter()
                 .setStatus(Status.ACTIVE)
                 .setScooterModel(testScooterModel)
@@ -89,7 +88,7 @@ class ScooterServiceTest {
     @Test
     void addScooterTest() {
         when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
-        when(scooterModelRepository.findByModel(anyString())).thenReturn(optionalTestScooterModel);
+        when(scooterModelRepository.findByModel(anyString())).thenReturn(Optional.of(testScooterModel));
 
         scooterService.add(testAddScooterDto);
 
@@ -103,25 +102,11 @@ class ScooterServiceTest {
     }
 
     @Test
-    void addScooterModelStatusIsNotActiveExceptionTest() {
-        when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
-        when(scooterModelRepository.findByModel(anyString())).thenReturn(optionalTestScooterModel);
-        optionalTestScooterModel.get().setStatus(Status.NOT_ACTIVE);
-        assertThrows(ServiceException.class, () -> scooterService.add(testAddScooterDto));
-    }
-
-    @Test
     void getAllTest() {
         when(scooterRepository.findAll(any(Pageable.class))).thenReturn(testScooterPage);
         when(scooterMapper.scooterToScooterWithoutHistoriesDto(any(Scooter.class)))
                 .thenReturn(testScooterWithoutHistoriesDto, testScooterWithoutHistoriesDto2);
         assertEquals(testScooterWithoutHistoriesDtoPage, scooterService.getAll(0, 2));
-    }
-
-    @Test
-    void getAllPageIsEmptyExceptionTest() {
-        when(scooterRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>()));
-        assertThrows(ServiceException.class, () -> scooterService.getAll(1, 1));
     }
 
     @Test
