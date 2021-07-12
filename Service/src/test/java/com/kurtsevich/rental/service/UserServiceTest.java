@@ -140,11 +140,7 @@ class UserServiceTest {
         when(passportRepository.save(testPassport)).thenReturn(testPassport);
         when(userProfileRepository.save(testUserProfile)).thenReturn(testUserProfile);
 
-        userService.register(testCreateUserDto);
-
-        verify(userRepository, times(1)).save(testUser);
-        verify(passportRepository, times(1)).save(testPassport);
-        verify(userProfileRepository, times(1)).save(testUserProfile);
+        assertEquals(testUser, userService.register(testCreateUserDto));
     }
 
     @Test
@@ -177,8 +173,8 @@ class UserServiceTest {
 
     @Test
     void notFoundUsersRoleExceptionTest() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser.setRoles(new ArrayList<>())));
-        when(roleRepository.findById(anyLong())).thenReturn(Optional.of(testRole));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(roleRepository.findById(anyLong())).thenReturn(Optional.of(testRole.setUsers(new ArrayList<>())));
 
         assertThrows(ServiceException.class, () -> userService.deleteUserRole(1L, 1L));
     }

@@ -35,19 +35,18 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ScooterModelServiceTest {
-    @InjectMocks
-    private ScooterModelService scooterModelService;
-    @Mock
-    private ScooterModelRepository scooterModelRepository;
-    @Mock
-    private ScooterModelMapper mapper;
-
     private static ScooterModel testScooterModel;
     private static ScooterModelDto testScooterModelDto;
     private static ScooterModelDto testScooterModelDto2;
     private static UpdateScooterModelDto testUpdateScooterModelDto;
     private static Page<ScooterModel> testScooterModelPage;
     private static Page<ScooterModelDto> testScooterModelDtoPage;
+    @InjectMocks
+    private ScooterModelService scooterModelService;
+    @Mock
+    private ScooterModelRepository scooterModelRepository;
+    @Mock
+    private ScooterModelMapper mapper;
 
     @BeforeAll
     static void init() {
@@ -83,9 +82,7 @@ class ScooterModelServiceTest {
     void addScooterModelTest() {
         when(mapper.scooterModelDtoToScooterModel(testScooterModelDto)).thenReturn(testScooterModel);
 
-        scooterModelService.add(testScooterModelDto);
-
-        verify(scooterModelRepository, times(1)).save(testScooterModel);
+        assertEquals(testScooterModel, scooterModelService.add(testScooterModelDto));
     }
 
     @Test

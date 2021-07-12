@@ -51,11 +51,16 @@ public class HistoryService implements IHistoryService {
         Scooter scooter = scooterRepository.findById(userProfileScooterAndPriceDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getScooterId()));
 
+        if( scooter.getRentalPoint() == null){
+            log.warn("IN HistoryService:createHistory - scooter with id {} not have a role", scooter.getId());
+            throw new ServiceException("Scooter with id " + userProfileScooterAndPriceDto.getScooterId() + " doesn't have rental point");
+        }
+
         checkEntity.checkIsActive(userProfile.getStatus(), scooter.getStatus(), scooter.getRentalPoint().getStatus());
 
         if (scooter.getRentTerms() == null) {
-            log.warn("IN HistoryService:createHistory - scooter with id {} not have a role", scooter.getId());
-            throw new ServiceException("User is not active");
+            log.warn("IN HistoryService:createHistory - scooter with id {} not have a rent terms", scooter.getId());
+            throw new ServiceException("scooter with id " + scooter.getId()  + " not have a rent terms");
         }
 
         scooter.setStatus(Status.BOOKED);
@@ -141,7 +146,7 @@ public class HistoryService implements IHistoryService {
     }
 
     private FinishedHistoryDto createFinishedHistoryDto(History history, Long mileage, int travelTime, double sumWithDiscount, double amountToPay) {
-        FinishedHistoryDto finishedHistoryDto = historyMapper.historyToHFinishedHistoryDto(history);
+        FinishedHistoryDto finishedHistoryDto = historyMapper.historyToFinishedHistoryDto(history);
         finishedHistoryDto.setDistance(mileage);
         finishedHistoryDto.setTravelTime(travelTime);
         finishedHistoryDto.setPrice(sumWithDiscount);

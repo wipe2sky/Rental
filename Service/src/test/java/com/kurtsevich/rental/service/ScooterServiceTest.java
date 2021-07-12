@@ -31,14 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ScooterServiceTest {
     @InjectMocks
-    ScooterService scooterService;
+    private ScooterService scooterService;
     private AddScooterDto testAddScooterDto;
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto;
     private ScooterWithoutHistoriesDto testScooterWithoutHistoriesDto2;
@@ -90,9 +88,7 @@ class ScooterServiceTest {
         when(scooterMapper.addScooterDtoToScooter(testAddScooterDto)).thenReturn(testScooter);
         when(scooterModelRepository.findByModel(anyString())).thenReturn(Optional.of(testScooterModel));
 
-        scooterService.add(testAddScooterDto);
-
-        verify(scooterRepository, times(1)).save(testScooter);
+        assertEquals(testScooter, scooterService.add(testAddScooterDto));
     }
 
     @Test

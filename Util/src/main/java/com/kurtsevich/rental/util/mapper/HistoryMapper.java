@@ -21,5 +21,5 @@ public interface HistoryMapper {
     HistoryWithoutUserProfileDto historyToHistoryWithoutUserProfileDto(History history);
     History historyWithoutUserProfileDtoToHistory(HistoryWithoutUserProfileDto historyWithoutUserProfileDto);
 
-    FinishedHistoryDto historyToHFinishedHistoryDto(History history);
+    FinishedHistoryDto historyToFinishedHistoryDto(History history);
 }
