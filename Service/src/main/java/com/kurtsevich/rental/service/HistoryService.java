@@ -160,6 +160,10 @@ public class HistoryService implements IHistoryService {
     @Override
     public Page<HistoryDto> findAllHistoryByUsername(String username, int page, int size) {
         Page<History> historiesPage = historyRepository.findAllByUsername(username, PageRequest.of(page, size));
+        if (historiesPage.getTotalPages() <= page) {
+            log.warn("IN HistoryService:findAllHistoryByUsername - Request page number greater than available");
+            throw new NotFoundEntityException("Request page number greater than available");
+        }
         List<HistoryDto> historyDtoList = historiesPage.getContent().stream()
                 .map(historyMapper::historyToHistoryDto)
                 .collect(Collectors.toList());

@@ -13,13 +13,18 @@ import java.time.LocalDateTime;
 
 @Data
 public class UserProfileWithoutHistoriesDto {
+    @NotNull(message = "id must not be null")
+    private Long id;
+
     @NotNull(message = "status must not be null")
     private Status status;
 
     @NotNull(message = "created must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime created;
 
     @NotNull(message = "updated must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime updated;
 
     @NotBlank(message = "firstName must not be null")
@@ -36,8 +41,10 @@ public class UserProfileWithoutHistoriesDto {
     private PassportDto passport;
 
     @NotNull(message = "discount must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer discount;
 
     @NotNull(message = "prepayments must not be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private BigDecimal prepayments;
 }

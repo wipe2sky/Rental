@@ -36,6 +36,7 @@ allprojects {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    implementation 'org.liquibase:liquibase-core:4.4.1'
 
     implementation(project(':Controller'))
     implementation(project(':Service'))

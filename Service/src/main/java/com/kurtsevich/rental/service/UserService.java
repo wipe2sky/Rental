@@ -12,8 +12,8 @@ import com.kurtsevich.rental.dto.passport.UpdatePassportDto;
 import com.kurtsevich.rental.dto.user.AddPrepaymentsDto;
 import com.kurtsevich.rental.dto.user.ChangeUserPasswordDto;
 import com.kurtsevich.rental.dto.user.CreateUserDto;
-import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.SetDiscountDto;
+import com.kurtsevich.rental.dto.user.UpdateUserProfileDto;
 import com.kurtsevich.rental.dto.user.UserDto;
 import com.kurtsevich.rental.model.Passport;
 import com.kurtsevich.rental.model.Role;
@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,8 +57,9 @@ public class UserService implements IUserService {
         user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
         userRepository.save(user);
 
-        user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new NotFoundEntityException("role by name ROLE_USER"))));
+        roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new NotFoundEntityException("role by name ROLE_USER"))
+                .getUsers().add(user);
 
         Passport passport = userMapper.createdUserDtoToPassport(createUserDto);
         passportRepository.save(passport);

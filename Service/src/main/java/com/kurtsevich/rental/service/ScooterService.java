@@ -85,9 +85,10 @@ public class ScooterService implements IScooterService {
     @Override
     @Transactional
     public void addRentTermsToScooter(Long scooterId, Long termsId) {
-        scooterRepository.findById(scooterId)
-                .orElseThrow(() -> new NotFoundEntityException(scooterId))
-                .setRentTerms(rentTermsRepository.findById(termsId)
+        Scooter scooter = scooterRepository.findById(scooterId)
+                .orElseThrow(() -> new NotFoundEntityException(scooterId));
+        checkEntity.checkIsActive(scooter.getStatus());
+                scooter.setRentTerms(rentTermsRepository.findById(termsId)
                         .orElseThrow(() -> new NotFoundEntityException(termsId)));
         log.info("IN ScooterService:addRentTermsToScooter - rent terms with id {} added to scooter with id {}",
                 scooterId, termsId);
@@ -99,6 +100,7 @@ public class ScooterService implements IScooterService {
     public void deleteRentTermsFromScooter(Long scooterId) {
         Scooter scooter = scooterRepository.findById(scooterId)
                 .orElseThrow(() -> new NotFoundEntityException(scooterId));
+        checkEntity.checkIsActive(scooter.getStatus());
         scooter.setRentTerms(null);
         log.info("IN ScooterService:deleteRentTermsAtScooter - rent terms deleted at scooter with id {}",
                 scooterId);

@@ -1,0 +1,438 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: skurt
+      changes:
+        - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 2
+      author: skurt
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: skurt
+      changes:
+        - createTable:
+            tableName: user_role
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_user_role
+                    referencedTableName: user
+                    referencedColumnNames: id
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_role_user
+                    referencedTableName: role
+                    referencedColumnNames: id
+  - changeSet:
+      id: 4
+      author: skurt
+      changes:
+        - createTable:
+            tableName: passport
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: passport_number
+                  type: VARCHAR(9)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: identification_number
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: date_of_issue
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_expire
+                  type: DATE
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 5
+      author: skurt
+      changes:
+        - createTable:
+            tableName: user_profile
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: VARCHAR(12)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: first_name
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: discount
+                  type: INT(2)
+                  constraints:
+                    default: 0
+              - column:
+                  name: prepayments
+                  type: DECIMAL(7,2)
+                  constraints:
+                    default: 0
+              - column:
+                  name: passport
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_user_passport
+                    referencedTableName: passport
+                    referencedColumnNames: id
+              - column:
+                  name: user
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_profile_user
+                    referencedTableName: user
+                    referencedColumnNames: id
+  - changeSet:
+      id: 6
+      author: skurt
+      changes:
+        - createTable:
+            tableName: scooter_model
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: model
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: status
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_speed
+                  type: INT(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: weight
+                  type: DECIMAL(4,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: weight_limit
+                  type: INT(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: power
+                  type: INT(4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 7
+      author: skurt
+      changes:
+        - createTable:
+            tableName: rental_point
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: status
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street_name
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street_type
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street_number
+                  type: INT(4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: street_number_suffix
+                  type: CHAR(1)
+              - column:
+                  name: phone_number
+                  type: VARCHAR(12)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 8
+      author: skurt
+      changes:
+        - createTable:
+            tableName: rent_terms
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(40)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: price
+                  type: DECIMAL(7,2)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 9
+      author: skurt
+      changes:
+        - createTable:
+            tableName: scooter
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: charge
+                  type: INT(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mileage
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scooter_model
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_scooter_model
+                    referencedTableName: scooter_model
+                    referencedColumnNames: id
+              - column:
+                  name: rental_point
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_scooter_rental_point
+                    referencedTableName: rental_point
+                    referencedColumnNames: id
+              - column:
+                  name: rent_terms
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_scooter_rent_terms
+                    referencedTableName: rent_terms
+                    referencedColumnNames: id
+  - changeSet:
+      id: 10
+      author: skurt
+      changes:
+        - createTable:
+            tableName: history
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: finished
+                  type: DATETIME
+              - column:
+                  name: distance
+                  type: BIGINT
+              - column:
+                  name: price
+                  type: DECIMAL(7,2)
+              - column:
+                  name: actual_discount
+                  type: INT(3)
+              - column:
+                  name: is_actual
+                  type: BIT(1)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scooter
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_history_scooter
+                    referencedTableName: scooter
+                    referencedColumnNames: id
+              - column:
+                  name: user_profile
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_history_user_profile
+                    referencedTableName: user_profile
+                    referencedColumnNames: id
