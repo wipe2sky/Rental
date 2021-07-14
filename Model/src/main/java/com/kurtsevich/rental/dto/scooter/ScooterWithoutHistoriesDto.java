@@ -27,12 +27,10 @@ public class ScooterWithoutHistoriesDto {
     private LocalDateTime updated;
 
     @NotNull(message = "scooterModel must not be null")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private ScooterModelDto scooterModel;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private RentalPointWithoutScootersDto rentalPoint;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private RentTermsDto rentTerms;
 }
