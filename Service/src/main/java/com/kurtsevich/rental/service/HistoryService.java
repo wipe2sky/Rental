@@ -22,8 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,7 +51,7 @@ public class HistoryService implements IHistoryService {
         Scooter scooter = scooterRepository.findById(userProfileScooterAndPriceDto.getScooterId())
                 .orElseThrow(() -> new NotFoundEntityException(userProfileScooterAndPriceDto.getScooterId()));
 
-        if( scooter.getRentalPoint() == null){
+        if (scooter.getRentalPoint() == null) {
             log.warn("IN HistoryService:createHistory - scooter with id {} not have a role", scooter.getId());
             throw new ServiceException("Scooter with id " + userProfileScooterAndPriceDto.getScooterId() + " doesn't have rental point");
         }
@@ -60,7 +60,7 @@ public class HistoryService implements IHistoryService {
 
         if (scooter.getRentTerms() == null) {
             log.warn("IN HistoryService:createHistory - scooter with id {} not have a rent terms", scooter.getId());
-            throw new ServiceException("scooter with id " + scooter.getId()  + " not have a rent terms");
+            throw new ServiceException("scooter with id " + scooter.getId() + " not have a rent terms");
         }
 
         scooter.setStatus(Status.BOOKED);
