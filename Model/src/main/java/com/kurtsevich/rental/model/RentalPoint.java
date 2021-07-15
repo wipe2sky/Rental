@@ -3,6 +3,7 @@ package com.kurtsevich.rental.model;
 import com.kurtsevich.rental.Status;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "rental_point")
 public class RentalPoint extends BaseEntity {
     @Column(name = "name", nullable = false, unique = true)

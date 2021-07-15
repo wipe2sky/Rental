@@ -16,6 +16,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "user")
 public class User extends BaseEntity {
     @Column(name = "username", nullable = false, unique = true)

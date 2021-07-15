@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "history")
 public class History extends BaseEntity {
     @CreationTimestamp

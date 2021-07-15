@@ -24,6 +24,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)

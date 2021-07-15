@@ -109,6 +109,10 @@ public class ScooterService implements IScooterService {
     @Override
     public Page<ScooterWithoutHistoriesDto> findAllScootersByModelId(Long scooterModelId, int page, int size) {
         Page<Scooter> scooters = scooterRepository.findAllByScooterModelId(scooterModelId, PageRequest.of(page, size));
+        if (scooters.getTotalPages() <= page) {
+            log.warn("IN ScooterService:getAll - Request page number greater than available");
+            throw new NotFoundEntityException("Request page number greater than available");
+        }
         List<ScooterWithoutHistoriesDto> scootersDto = scooters.getContent().stream()
                 .map(scooterMapper::scooterToScooterWithoutHistoriesDto)
                 .collect(Collectors.toList());

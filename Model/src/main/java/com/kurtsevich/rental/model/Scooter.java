@@ -23,6 +23,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "scooter")
 public class Scooter extends BaseEntity {
     @Enumerated(EnumType.STRING)

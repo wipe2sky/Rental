@@ -2,6 +2,7 @@ package com.kurtsevich.rental.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "passport")
 public class Passport extends BaseEntity {
     @Column(name = "passport_number", nullable = false, unique = true)
