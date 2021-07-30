@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.kurtsevich'
@@ -19,7 +19,7 @@ compileJava {
 }
 
 dependencies {
-    compile (project(':Model'))
+    api(project(':Model'))
     implementation "mysql:mysql-connector-java:${mySqlVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

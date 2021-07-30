@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.kurtsevich'
@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(':API'))
-    compile(project(':Security'))
+    api(project(':Security'))
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }

@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.kurtsevich'
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile (project(':Util'))
+    api(project(':Util'))
 }
 
 test {

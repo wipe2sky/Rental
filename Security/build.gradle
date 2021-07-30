@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.kurtsevich'
@@ -11,9 +11,9 @@ repositories {
 
 dependencies {
     implementation(project(':API'))
-    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
-    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    api "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    api "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
+    api group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 }
 
 test {

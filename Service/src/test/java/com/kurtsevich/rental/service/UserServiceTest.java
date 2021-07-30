@@ -118,7 +118,8 @@ class UserServiceTest {
         testRole = new Role()
                 .setName("ROLE_USER")
                 .setCreated(LocalDateTime.now())
-                .setUpdated(LocalDateTime.now());
+                .setUpdated(LocalDateTime.now())
+                .setUsers(new ArrayList<>());
 
         testPassport = new Passport()
                 .setPassportNumber("MP4678344")

@@ -1,0 +1,35 @@
+version: "1"
+
+services:
+  mysql-db:
+    container_name: docker-mysql-server
+    restart: always
+    image: mysql/mysql-server
+    environment:
+      MYSQL_ROOT_PASSWORD: '6250e208'
+      MYSQL_DATABASE: rentdb
+      MYSQL_USER : 'root'
+      MYSQL_PASSWORD : '6250e208'
+    ports:
+      - 8806:3306
+    networks:
+      - my-network
+    volumes:
+      - mysqldb:/var/lib/mysql
+
+  rental_app:
+    container_name: rental
+    build:
+      dockerfile: Dockerfile
+    image: openjdk:16-alpine3.13
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+volumes:
+  mysqldb:
